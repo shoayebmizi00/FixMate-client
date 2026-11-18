@@ -23,7 +23,7 @@ function ServiceDetail({ service }: { service: Service }) {
 
   return (
     <main className="min-h-[65vh] bg-[#f6f9fc] px-4 py-8 font-[family-name:var(--font-geist-sans)] sm:px-6 sm:py-10 lg:px-8">
-      <div className="mx-auto max-w-5xl">
+      <div className="container mx-auto">
         <nav
           aria-label="Breadcrumb"
           className="mb-5 flex items-center gap-2 text-xs text-slate-500"
@@ -188,14 +188,16 @@ function ServiceDetail({ service }: { service: Service }) {
 function ServiceDetailSkeleton() {
   return (
     <main
-      className="mx-auto min-h-[65vh] max-w-5xl space-y-5 px-4 py-10 sm:px-6 lg:px-8"
+      className="min-h-[65vh] px-4 py-10 sm:px-6 lg:px-8"
       aria-label="Loading service"
       role="status"
     >
-      <div className="h-5 w-48 animate-pulse rounded bg-slate-200" />
-      <div className="grid gap-5 md:grid-cols-2">
-        <div className="aspect-[1.5] animate-pulse rounded-2xl bg-slate-200" />
-        <div className="h-72 animate-pulse rounded-2xl bg-slate-200" />
+      <div className="container mx-auto space-y-5">
+        <div className="h-5 w-48 animate-pulse rounded bg-slate-200" />
+        <div className="grid gap-5 md:grid-cols-2">
+          <div className="aspect-[1.5] animate-pulse rounded-2xl bg-slate-200" />
+          <div className="h-72 animate-pulse rounded-2xl bg-slate-200" />
+        </div>
       </div>
     </main>
   );
@@ -214,19 +216,21 @@ async function ServiceDetailContent({
   } catch (error) {
     console.error("Could not load service details:", error);
     return (
-      <main className="mx-auto min-h-[65vh] max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
-        <p
-          role="alert"
-          className="rounded-2xl border border-rose-200 bg-white p-6 text-sm text-rose-700"
-        >
-          Service details are temporarily unavailable. Please try again later.
-        </p>
-        <Link
-          href="/services"
-          className="mt-5 inline-flex text-sm font-medium text-blue-700 hover:text-blue-800"
-        >
-          Browse all services
-        </Link>
+      <main className="min-h-[65vh] px-4 py-10 sm:px-6 lg:px-8">
+        <div className="container mx-auto">
+          <p
+            role="alert"
+            className="rounded-2xl border border-rose-200 bg-white p-6 text-sm text-rose-700"
+          >
+            Service details are temporarily unavailable. Please try again later.
+          </p>
+          <Link
+            href="/services"
+            className="mt-5 inline-flex text-sm font-medium text-blue-700 hover:text-blue-800"
+          >
+            Browse all services
+          </Link>
+        </div>
       </main>
     );
   }

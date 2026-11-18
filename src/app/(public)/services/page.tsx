@@ -47,7 +47,7 @@ function ServiceCatalogSkeleton() {
   return (
     <div className="space-y-4" aria-label="Loading services" role="status">
       <div className="h-20 animate-pulse rounded-2xl bg-slate-200" />
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
         {Array.from({ length: 6 }, (_, index) => (
           <div
             key={index}
@@ -66,7 +66,7 @@ export default function ServicesPage({
 }) {
   return (
     <main className="min-h-[65vh] bg-[#f6f9fc] px-4 py-10 font-[family-name:var(--font-geist-sans)] sm:px-6 sm:py-12 lg:px-8">
-      <div className="mx-auto max-w-5xl">
+      <div className="container mx-auto">
         <header className="mb-6">
           <p className="text-[11px] font-semibold tracking-[0.18em] text-blue-600 uppercase">
             Service catalogue
@@ -74,7 +74,7 @@ export default function ServicesPage({
           <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
             Find the right repair
           </h1>
-          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-500 sm:text-base">
+          <p className="mt-2 text-sm leading-relaxed text-slate-500 sm:text-base">
             Every listing is published by a registered technician and approved
             by FixMate before it appears here.
           </p>
