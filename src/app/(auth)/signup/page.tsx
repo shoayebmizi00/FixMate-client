@@ -79,7 +79,7 @@ export default function SignUpPage() {
   const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [role, setRole] = useState<"user" | "technician">("user");
+  const [role, setRole] = useState<"customer" | "technician">("customer");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -253,8 +253,8 @@ export default function SignUpPage() {
 
   const roleOptions = [
     {
-      value: "user" as const,
-      title: "User",
+      value: "customer" as const,
+      title: "Customer",
       hint: "Find help for repairs",
       Icon: UserRound,
     },

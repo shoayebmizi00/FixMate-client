@@ -8,17 +8,17 @@ const quickLinks = [
   { label: "Home", href: "/" },
   { label: "Browse services", href: "/services" },
   { label: "About FixMate", href: "/about" },
-  { label: "Sign in", href: "/sign-in" },
+  { label: "Sign in", href: "/signin" },
 ];
 
 const popularRepairs = [
-  { label: "Smartphone", href: "/services/smartphone" },
-  { label: "Laptop & PC", href: "/services/laptop-and-pc" },
-  { label: "AC", href: "/services/ac" },
-  { label: "Refrigerator", href: "/services/refrigerator" },
-  { label: "TV", href: "/services/tv" },
-  { label: "Washing Machine", href: "/services/washing-machine" },
-  { label: "Electrical", href: "/services/electrical" },
+  { label: "Smartphone", href: "/services?category=Electronics%20Repair" },
+  { label: "Laptop & PC", href: "/services?category=Electronics%20Repair" },
+  { label: "AC", href: "/services?category=Appliance%20Repair" },
+  { label: "Refrigerator", href: "/services?category=Appliance%20Repair" },
+  { label: "TV", href: "/services?category=Electronics%20Repair" },
+  { label: "Washing Machine", href: "/services?category=Appliance%20Repair" },
+  { label: "Electrical", href: "/services?category=Electrical" },
 ];
 
 function XIcon({ className }: { className?: string }) {
@@ -103,7 +103,7 @@ export default function Footer() {
             </h3>
             <ul className="mt-5 space-y-3.5">
               {popularRepairs.map((repair) => (
-                <li key={repair.href}>
+                <li key={repair.label}>
                   <Link
                     href={repair.href}
                     className="text-[15px] transition-colors hover:text-white"

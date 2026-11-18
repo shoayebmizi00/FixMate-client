@@ -119,7 +119,7 @@ export default function Navbar() {
                       {user.name}
                     </span>
                     <span className="text-xs font-normal text-muted-foreground">
-                      {user.role === "technician" ? "Technician" : "User"}
+                      {user.role === "technician" ? "Technician" : "Customer"}
                     </span>
                   </DropdownMenuLabel>
                 </DropdownMenuGroup>
