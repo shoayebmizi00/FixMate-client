@@ -1,9 +1,16 @@
 
+import { Suspense } from 'react'
+import { connection } from 'next/server'
 import { stripe } from '@/lib/stripe'
 import { redirect } from 'next/navigation'
 
+type SuccessProps = {
+  searchParams: Promise<{ session_id?: string }>
+}
 
-export default async function Success({ searchParams } : { searchParams: { session_id?: string } }) {
+async function SuccessContent({ searchParams }: SuccessProps) {
+  await connection()
+
   const { session_id } = await searchParams
 
   if (!session_id)
@@ -31,4 +38,12 @@ export default async function Success({ searchParams } : { searchParams: { sessi
       </section>
     )
   }
+}
+
+export default function Success({ searchParams }: SuccessProps) {
+  return (
+    <Suspense fallback={<p>Confirming your payment...</p>}>
+      <SuccessContent searchParams={searchParams} />
+    </Suspense>
+  )
 }
