@@ -37,6 +37,9 @@ The app loads `.env` for development and build. The repository has no `.env.exam
 - `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`
 - `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET`
 - `IMAGEBB_API_KEY` for `POST /api/upload`
+- `STRIPE_SECRET_KEY` for hosted Stripe Checkout (`sk_test_...` in test mode)
+
+`NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` may also be set, but hosted Checkout does not need it.
 
 `src/lib/auth.ts` constructs the MongoDB client and selects the `fixmate` database at module scope, so authentication and build-adjacent code require a usable MongoDB configuration.
 
@@ -50,6 +53,7 @@ The app loads `.env` for development and build. The repository has no `.env.exam
   - HTTP catch-all: `src/app/api/auth/[...all]/route.ts`
 - Add authentication behavior through the better-auth configuration and existing `signIn`/`signUp`/`signOut`/`useSession` exports. Do not create separate auth API route files.
 - The signup flow uploads avatar images through `POST /api/upload` and then passes the returned image URL to `signUp.email`. Preserve this server-mediated upload pattern.
+- Payments use hosted Stripe Checkout. The booking form lives at `/services/[id]/book`; `POST /api/checkout_sessions` reads the service price from `BASE_API_URL` (never from the browser) and creates a BDT checkout session. `/checkout/success` confirms `payment_status === "paid"` and writes the booking and transaction via the Express API, checking `stripeSessionId` and the transaction reference first so reloads are idempotent. `src/lib/stripe.ts` is server-only.
 
 ## Framework conventions
 

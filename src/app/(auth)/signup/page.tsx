@@ -75,6 +75,19 @@ function GithubIcon({ className }: { className?: string }) {
   );
 }
 
+// Allows pages to send users back after sign-up, for example a booking page.
+function nextPath() {
+  if (typeof window === "undefined") return "/dashboard";
+
+  const next = new URLSearchParams(window.location.search).get("next");
+
+  if (!next || !next.startsWith("/") || next.startsWith("//")) {
+    return "/dashboard";
+  }
+
+  return next;
+}
+
 export default function SignUpPage() {
   const router = useRouter();
   const [name, setName] = useState("");
@@ -108,7 +121,7 @@ export default function SignUpPage() {
     try {
       const result = await signIn.social({
         provider: "google",
-        callbackURL: "/dashboard",
+        callbackURL: nextPath(),
         additionalData: { role },
       });
 
@@ -132,7 +145,7 @@ export default function SignUpPage() {
     try {
       const result = await signIn.social({
         provider: "github",
-        callbackURL: "/dashboard",
+        callbackURL: nextPath(),
         additionalData: { role },
       });
 
@@ -241,7 +254,7 @@ export default function SignUpPage() {
         type: "success",
       });
 
-      router.push("/dashboard");
+      router.push(nextPath());
       router.refresh();
     } catch {
       setError("Could not reach the server. Please try again.");

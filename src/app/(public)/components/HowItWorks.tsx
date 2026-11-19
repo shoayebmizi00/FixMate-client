@@ -11,23 +11,23 @@ const steps = [
   {
     number: "02",
     icon: FileText,
-    title: "Send a repair request",
+    title: "Pay & send the request",
     description:
-      "Share your address, preferred date and the problem. The technician reviews your request.",
+      "Add your address and preferred date, then pay securely by card with Stripe to confirm the booking.",
   },
   {
     number: "03",
     icon: Wrench,
     title: "Technician fixes it",
     description:
-      "Track the job from accepted to in progress, and see the final amount once the work is done.",
+      "The technician accepts the request, confirms the details and completes the repair.",
   },
   {
     number: "04",
     icon: CreditCard,
-    title: "Pay after completion",
+    title: "Track every update",
     description:
-      "Only after the repair is marked complete do you pay the final amount through secure checkout.",
+      "Follow the job from accepted to completed and keep the payment receipt in your dashboard.",
   },
 ];
 

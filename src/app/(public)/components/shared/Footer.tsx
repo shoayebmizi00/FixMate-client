@@ -53,8 +53,9 @@ export default function Footer() {
             </Link>
 
             <p className="mt-6 max-w-xs text-sm leading-relaxed">
-              Trusted repairs. Transparent service. Pay after completion. Book verified
-              technicians for phones, laptops, appliances and home electrical work.
+              Trusted repairs. Transparent service. Secure card checkout. Book
+              verified technicians for phones, laptops, appliances and home
+              electrical work.
             </p>
 
             <div className="mt-6 flex items-center gap-3">

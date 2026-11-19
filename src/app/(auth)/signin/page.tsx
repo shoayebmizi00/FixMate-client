@@ -30,8 +30,9 @@ const benefits = [
   },
   {
     icon: HandCoins,
-    title: "Pay after completion",
-    description: "Nothing is charged until the repair is finished.",
+    title: "Secure card payments",
+    description:
+      "Bookings are confirmed through Stripe with a receipt for every job.",
   },
   {
     icon: Lock,
@@ -76,6 +77,19 @@ function GithubIcon({ className }: { className?: string }) {
   );
 }
 
+// Allows pages to send users back after sign-in, for example a booking page.
+function nextPath() {
+  if (typeof window === "undefined") return "/dashboard";
+
+  const next = new URLSearchParams(window.location.search).get("next");
+
+  if (!next || !next.startsWith("/") || next.startsWith("//")) {
+    return "/dashboard";
+  }
+
+  return next;
+}
+
 export default function SignInPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -94,7 +108,7 @@ export default function SignInPage() {
 
     const { error: socialError } = await signIn.social({
       provider,
-      callbackURL: "/dashboard",
+      callbackURL: nextPath(),
     });
 
     if (socialError) {
@@ -131,7 +145,7 @@ export default function SignInPage() {
       return;
     }
 
-    router.push("/dashboard");
+    router.push(nextPath());
     router.refresh();
   }
 
@@ -182,8 +196,8 @@ export default function SignInPage() {
             Your repairs, all in one place.
           </h2>
           <p className="mt-5 text-base leading-relaxed text-blue-100/80">
-            Sign in to track every job, follow each status update and pay only
-            once the work is complete.
+            Sign in to book a repair, pay securely by card and follow each
+            status update.
           </p>
 
           <ul className="mt-10 space-y-5">
@@ -207,7 +221,7 @@ export default function SignInPage() {
         </div>
 
         <p className="relative text-sm text-blue-100/50">
-          Trusted repairs. Transparent service. Pay after completion.
+          Trusted repairs. Transparent service. Secure card checkout.
         </p>
       </aside>
 

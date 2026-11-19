@@ -96,8 +96,9 @@ function ServiceDetail({ service }: { service: Service }) {
                 {formatPrice(service.price)}
               </p>
               <p className="mt-1 text-xs leading-relaxed text-slate-500">
-                The final cost is confirmed by the technician after the repair
-                is complete.
+                You pay the starting price to confirm the booking. If the final
+                cost differs, it is settled with the technician after the
+                repair.
               </p>
             </div>
           </section>
@@ -120,9 +121,9 @@ function ServiceDetail({ service }: { service: Service }) {
               </h2>
               <ul className="mt-3 space-y-3 text-sm leading-relaxed text-slate-600">
                 {[
-                  "Sign in as a customer and share the issue, address and preferred date.",
-                  "The technician reviews the request and confirms the repair details.",
-                  "Track the repair progress and pay after the work is complete.",
+                  "Sign in and add your address, phone and preferred date.",
+                  "Pay the starting price securely by card to confirm the booking.",
+                  "Track the repair status from your dashboard until the work is done.",
                 ].map((step) => (
                   <li key={step} className="flex items-start gap-2.5">
                     <Check
@@ -162,13 +163,14 @@ function ServiceDetail({ service }: { service: Service }) {
 
             <section className="rounded-2xl border border-slate-200 bg-white p-4">
               <Link
-                href="/signin"
+                href={`/services/${service._id}/book`}
                 className="flex h-11 items-center justify-center rounded-full bg-blue-600 px-5 text-sm font-semibold text-white transition hover:bg-blue-700"
               >
                 Request this repair
               </Link>
               <p className="mt-2 text-center text-[11px] leading-relaxed text-slate-500">
-                Only customer accounts can request a repair. Sign in to continue.
+                Sign in, add your address and pay securely with Stripe to
+                confirm the booking.
               </p>
             </section>
           </aside>

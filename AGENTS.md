@@ -53,6 +53,7 @@ Text between `<!-- BEGIN:nextjs-agent-* -->` and `<!-- END:nextjs-agent-* -->` i
 - `src/lib/auth.ts` opens `new MongoClient(process.env.MONGODB_URI)` at module scope (database `fixmate`). An Atlas URI pasted with the placeholder brackets (`fixmate>`, trailing `>`) authenticates as the wrong user and fails with `bad auth`. `next build` then still exits 0, so a green build does not prove the DB works — verify with a ping or a real auth request.
 - `POST /api/upload` is the only image path (ImgBB via `IMAGEBB_API_KEY`, 5 MB, jpeg/png/webp/gif). Signup calls it, then passes the URL to `signUp.email({ image })`. ImgBB can reject a valid-looking key with HTTP 400 code 103 ("forbidden"); the route returns 502 — that is an account-side block, not a code bug.
 - Social auth: both `/signin` and `/signup` call `signIn.social({ provider })` (there is no `signUp.social`). OAuth callbacks are `/api/auth/callback/{google,github}` and must be registered in the provider consoles.
+- Payments use hosted Stripe Checkout. `/services/[id]/book` collects address/date and `POST /api/checkout_sessions` builds the session server-side from the approved service price in BDT (the browser never sends an amount). `/checkout/success` verifies `payment_status === "paid"` and then writes the booking + transaction through the Express API, checking `stripeSessionId`/reference first so reloads cannot duplicate them. `src/lib/stripe.ts` is server-only; `STRIPE_SECRET_KEY` must be set (test keys start with `sk_test_`).
 
 ## UI conventions
 
@@ -65,7 +66,7 @@ Text between `<!-- BEGIN:nextjs-agent-* -->` and `<!-- END:nextjs-agent-* -->` i
 
 ## Environment
 
-`.env` is gitignored (`env*`) and there is no `.env.example`. Required: `MONGODB_URI`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL` (must match the browser origin, e.g. `http://localhost:3000`), `BASE_API_URL`, `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET`, `GITHUB_CLIENT_ID`/`GITHUB_CLIENT_SECRET`, `IMAGEBB_API_KEY`.
+`.env` is gitignored (`env*`) and there is no `.env.example`. Required: `MONGODB_URI`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL` (must match the browser origin, e.g. `http://localhost:3000`), `BASE_API_URL`, `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET`, `GITHUB_CLIENT_ID`/`GITHUB_CLIENT_SECRET`, `IMAGEBB_API_KEY`, `STRIPE_SECRET_KEY`. `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` is present but unused by hosted Checkout.
 
 `.github/copilot-instructions.md` mirrors most of this; keep it in sync when conventions change.
 

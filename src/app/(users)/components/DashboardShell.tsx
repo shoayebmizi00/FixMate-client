@@ -29,9 +29,17 @@ export type DashboardShellUser = {
 const adminLinks = [
   { label: "Overview", href: "/admin", icon: LayoutDashboard },
   { label: "Manage users", href: "/admin/manage-users", icon: Users },
-  { label: "Service approval", href: "/admin/service-approval", icon: ShieldCheck },
+  {
+    label: "Service approval",
+    href: "/admin/service-approval",
+    icon: ShieldCheck,
+  },
   { label: "All bookings", href: "/admin/all-bookings", icon: ClipboardList },
-  { label: "Transactions", href: "/admin/transactions", icon: CircleDollarSign },
+  {
+    label: "Transactions",
+    href: "/admin/transactions",
+    icon: CircleDollarSign,
+  },
   { label: "Profile", href: "/profile", icon: User },
 ];
 
@@ -96,21 +104,23 @@ export default function DashboardShell({
   return (
     <div className="flex min-h-dvh bg-[#f6f9fc] font-[family-name:var(--font-geist-sans)]">
       <aside className="sticky top-0 hidden h-dvh w-[253px] shrink-0 flex-col border-r border-slate-200 bg-white lg:flex">
-        <div className="flex h-[72px] items-center gap-3 px-6">
-          <span className="relative size-10 shrink-0 overflow-hidden rounded-xl ring-1 ring-slate-900/5">
-            <Image
-              src={logo}
-              alt="FixMate logo"
-              fill
-              sizes="40px"
-              className="object-cover"
-              priority
-            />
-          </span>
-          <span className="text-xl font-bold tracking-tight text-slate-900">
-            Fix<span className="text-blue-600">Mate</span>
-          </span>
-        </div>
+        <Link href="/">
+          <div className="flex h-[72px] items-center gap-3 px-6">
+            <span className="relative size-10 shrink-0 overflow-hidden rounded-xl ring-1 ring-slate-900/5">
+              <Image
+                src={logo}
+                alt="FixMate logo"
+                fill
+                sizes="40px"
+                className="object-cover"
+                priority
+              />
+            </span>
+            <span className="text-xl font-bold tracking-tight text-slate-900">
+              Fix<span className="text-blue-600">Mate</span>
+            </span>
+          </div>
+        </Link>
 
         <div className="flex items-center gap-3 border-y border-slate-200 px-6 py-4">
           <span className="relative flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-blue-50 text-[13px] font-semibold text-blue-700">
@@ -151,7 +161,7 @@ export default function DashboardShell({
                   "flex items-center gap-3 rounded-lg px-3.5 py-2.5 text-[14px] font-medium transition-colors",
                   active
                     ? "bg-blue-50 text-blue-700"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900",
                 )}
               >
                 <Icon className="size-[18px] shrink-0" aria-hidden="true" />
@@ -220,7 +230,7 @@ export default function DashboardShell({
                   "shrink-0 rounded-full px-3.5 py-1.5 text-[13px] font-medium",
                   active
                     ? "bg-blue-600 text-white"
-                    : "border border-slate-200 text-slate-600"
+                    : "border border-slate-200 text-slate-600",
                 )}
               >
                 {link.label}
