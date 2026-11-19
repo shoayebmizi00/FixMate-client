@@ -1,3 +1,5 @@
+import { connection } from "next/server";
+
 export type TechnicianService = {
   id: string;
   title: string;
@@ -60,6 +62,11 @@ function isRawService(value: unknown): value is RawService {
  * work out each technician's specialties and how many repairs they published.
  */
 export async function fetchTechnicians(): Promise<Technician[]> {
+  // Skip prerendering so the request runs at real request time. Otherwise the
+  // in-flight fetch rejects after the prerender completes and Next reports
+  // HANGING_PROMISE_REJECTION.
+  await connection();
+
   const baseUrl = process.env.BASE_API_URL;
   if (!baseUrl) throw new Error("BASE_API_URL is not configured.");
 

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
+import { connection } from "next/server";
 import {
   ArrowLeft,
   BadgeCheck,
@@ -208,6 +209,8 @@ async function ServiceDetailContent({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await connection();
+
   const { id } = await params;
   let services: Service[];
 

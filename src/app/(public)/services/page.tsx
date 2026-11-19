@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { connection } from "next/server";
 
 import ServiceCatalog from "../components/services/ServiceCatalog";
 import { fetchApprovedServices, type Service } from "@/lib/services";
@@ -14,6 +15,11 @@ async function ServiceResults({
 }) {
   let category = "";
   let services: Service[];
+
+  // `searchParams` is request-time data. This must stay outside the try/catch:
+  // during prerendering `connection()` rejects to abort this render, and if the
+  // error is caught the static shell would show the fallback instead.
+  await connection();
 
   try {
     const [params, approvedServices] = await Promise.all([

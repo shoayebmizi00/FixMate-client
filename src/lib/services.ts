@@ -1,3 +1,5 @@
+import { connection } from "next/server";
+
 import airConditionerFallback from "@/assets/5.png";
 
 const unavailableAirConditionerThumbnail =
@@ -51,6 +53,11 @@ function isService(value: unknown): value is Service {
 }
 
 export async function fetchApprovedServices(): Promise<Service[]> {
+  // Skip prerendering: the API must be called per request, not baked into the
+  // static shell. Without this, the fetch is still in flight when the prerender
+  // finishes and React reports HANGING_PROMISE_REJECTION.
+  await connection();
+
   const baseUrl = process.env.BASE_API_URL;
   if (!baseUrl) throw new Error("BASE_API_URL is not configured.");
 

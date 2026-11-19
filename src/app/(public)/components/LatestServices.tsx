@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { connection } from "next/server";
 import { ArrowUpRight, BadgeCheck, Clock3 } from "lucide-react";
 
 import airConditionerFallback from "@/assets/5.png";
@@ -39,6 +40,10 @@ function isService(value: unknown): value is Service {
 }
 
 async function fetchLatestServices() {
+  // Wait for an actual request so this fetch is not left in flight when the
+  // static shell finishes prerendering.
+  await connection();
+
   const baseUrl = process.env.BASE_API_URL;
   if (!baseUrl) throw new Error("BASE_API_URL is not configured.");
 
@@ -70,6 +75,11 @@ async function fetchLatestServices() {
 }
 
 export default async function LatestServices() {
+  // Outside the try/catch on purpose: during prerendering `connection()`
+  // rejects to abort the render, and catching that would bake the error
+  // fallback into the static shell.
+  await connection();
+
   let services: Service[] = [];
 
   try {

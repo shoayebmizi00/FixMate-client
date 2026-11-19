@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { connection } from "next/server";
 import {
   AirVent,
   ArrowUpRight,
@@ -44,6 +45,10 @@ function getCategoryIcon(category: string) {
 }
 
 async function fetchCategories() {
+  // Wait for an actual request so this fetch is not left in flight when the
+  // static shell finishes prerendering.
+  await connection();
+
   const baseUrl = process.env.BASE_API_URL;
   if (!baseUrl) throw new Error("BASE_API_URL is not configured.");
 
@@ -68,6 +73,11 @@ async function fetchCategories() {
 }
 
 export default async function Category() {
+  // Outside the try/catch on purpose: during prerendering `connection()`
+  // rejects to abort the render, and catching that would bake the error
+  // fallback into the static shell.
+  await connection();
+
   let categories: string[] = [];
 
   try {

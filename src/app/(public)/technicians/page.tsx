@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { connection } from "next/server";
 import {
   ArrowRight,
   BadgeCheck,
@@ -143,6 +144,11 @@ function TechnicianCard({ technician }: { technician: Technician }) {
 }
 
 async function TechnicianList() {
+  // Outside the try/catch on purpose: during prerendering `connection()`
+  // rejects to abort the render, and catching that would bake the error
+  // fallback into the static shell.
+  await connection();
+
   let technicians: Technician[];
 
   try {

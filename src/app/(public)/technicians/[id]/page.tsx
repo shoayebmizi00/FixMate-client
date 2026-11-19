@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { connection } from "next/server";
 import {
   ArrowLeft,
   ArrowRight,
@@ -182,6 +183,8 @@ async function TechnicianProfileContent({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await connection();
+
   const { id } = await params;
 
   let technicians: Technician[];
