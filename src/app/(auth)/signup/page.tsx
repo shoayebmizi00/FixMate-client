@@ -349,7 +349,7 @@ export default function SignUpPage() {
         </div>
 
         <p className="relative text-sm text-blue-100/50">
-          © {new Date().getFullYear()} FixMate
+          © 2026 FixMate
         </p>
       </aside>
 
