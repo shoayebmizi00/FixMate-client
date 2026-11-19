@@ -108,7 +108,7 @@ export default function SignUpPage() {
     try {
       const result = await signIn.social({
         provider: "google",
-        callbackURL: "/",
+        callbackURL: "/dashboard",
         additionalData: { role },
       });
 
@@ -132,7 +132,7 @@ export default function SignUpPage() {
     try {
       const result = await signIn.social({
         provider: "github",
-        callbackURL: "/",
+        callbackURL: "/dashboard",
         additionalData: { role },
       });
 
@@ -241,7 +241,7 @@ export default function SignUpPage() {
         type: "success",
       });
 
-      router.push("/");
+      router.push("/dashboard");
       router.refresh();
     } catch {
       setError("Could not reach the server. Please try again.");

@@ -94,7 +94,7 @@ export default function SignInPage() {
 
     const { error: socialError } = await signIn.social({
       provider,
-      callbackURL: "/",
+      callbackURL: "/dashboard",
     });
 
     if (socialError) {
@@ -131,7 +131,7 @@ export default function SignInPage() {
       return;
     }
 
-    router.push("/");
+    router.push("/dashboard");
     router.refresh();
   }
 
