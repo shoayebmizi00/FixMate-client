@@ -1,8 +1,7 @@
-
 import { Suspense } from 'react'
 import { connection } from 'next/server'
-import { stripe } from '@/lib/stripe'
 import { redirect } from 'next/navigation'
+import { stripe } from '@/lib/stripe'
 
 type SuccessProps = {
   searchParams: Promise<{ session_id?: string }>
@@ -10,24 +9,20 @@ type SuccessProps = {
 
 async function SuccessContent({ searchParams }: SuccessProps) {
   await connection()
-
   const { session_id } = await searchParams
 
-  if (!session_id)
-    throw new Error('Please provide a valid session_id (`cs_test_...`)')
+  if (!session_id) redirect('/')
 
   const checkout = await stripe.checkout.sessions.retrieve(session_id, {
-    expand: ['line_items', 'payment_intent']
+    expand: ['line_items', 'payment_intent'],
   })
-  const { status } = checkout
+
   const customerEmail =
     checkout.customer_details?.email ?? checkout.customer_email
 
-  if (status === 'open') {
-    return redirect('/')
-  }
+  if (checkout.status === 'open') redirect('/')
 
-  if (status === 'complete') {
+  if (checkout.status === 'complete') {
     return (
       <section id="success">
         <p>
@@ -38,6 +33,8 @@ async function SuccessContent({ searchParams }: SuccessProps) {
       </section>
     )
   }
+
+  return <p>Payment status: {checkout.status}</p>
 }
 
 export default function Success({ searchParams }: SuccessProps) {
