@@ -15,12 +15,17 @@ export type DashboardUser = {
 export type DashboardService = {
   _id: string;
   title: string;
+  slug?: string;
   category?: string;
   description?: string;
   price?: number;
+  estimatedDuration?: string;
   thumbnail?: string;
+  images?: string[];
   location?: string;
   serviceMode?: string;
+  serviceType?: string;
+  mode?: string;
   approvalStatus?: string;
   isActive?: boolean;
   technicianId?: string;

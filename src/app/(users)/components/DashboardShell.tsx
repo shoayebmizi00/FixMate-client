@@ -11,6 +11,8 @@ import {
   ShieldCheck,
   User,
   Users,
+  Wallet,
+  Wrench,
 } from "lucide-react";
 import type { ReactNode } from "react";
 
@@ -45,11 +47,20 @@ const adminLinks = [
 
 const customerLinks = [
   { label: "Overview", href: "/customer", icon: LayoutDashboard },
+  { label: "My bookings", href: "/customer/bookings", icon: ClipboardList },
+  { label: "Payments", href: "/customer/payments", icon: Wallet },
   { label: "Profile", href: "/profile", icon: User },
 ];
 
 const technicianLinks = [
   { label: "Overview", href: "/technician", icon: LayoutDashboard },
+  { label: "My services", href: "/technician/services", icon: Wrench },
+  { label: "Bookings", href: "/technician/bookings", icon: ClipboardList },
+  {
+    label: "Earnings",
+    href: "/technician/earnings",
+    icon: CircleDollarSign,
+  },
   { label: "Profile", href: "/profile", icon: User },
 ];
 
