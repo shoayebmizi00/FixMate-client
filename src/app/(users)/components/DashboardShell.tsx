@@ -8,9 +8,11 @@ import {
   ClipboardList,
   LayoutDashboard,
   LogOut,
+  Moon,
   Plus,
   Settings,
   ShieldCheck,
+  Sun,
   User,
   Users,
   Wallet,
@@ -18,7 +20,7 @@ import {
   Menu,
   X,
 } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import logo from "@/assets/logo.png";
 import { signOut } from "@/lib/auth-client";
@@ -116,6 +118,7 @@ export default function DashboardShell({
 }) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [theme, setTheme] = useState<"light" | "dark">("light");
   const links = linksForRole(user.role);
   const roleLabel =
     user.role === "admin"
@@ -123,6 +126,29 @@ export default function DashboardShell({
       : user.role === "technician"
         ? "Technician"
         : "Customer";
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      const savedTheme = localStorage.getItem("fixmate-theme");
+      setTheme(
+        savedTheme === "dark" ||
+          (!savedTheme &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches)
+          ? "dark"
+          : "light"
+      );
+    }, 0);
+
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  function toggleTheme() {
+    const nextTheme = theme === "dark" ? "light" : "dark";
+    setTheme(nextTheme);
+    document.documentElement.classList.toggle("dark", nextTheme === "dark");
+    document.documentElement.style.colorScheme = nextTheme;
+    localStorage.setItem("fixmate-theme", nextTheme);
+  }
 
   async function handleSignOut() {
     try {
@@ -237,12 +263,27 @@ export default function DashboardShell({
           </div>
 
           <div className="flex items-center gap-3">
-            <Link
-              href="/services"
-              className="hidden h-9 items-center rounded-full border border-slate-200 bg-white px-4 text-[13px] font-medium text-slate-800 transition-colors hover:bg-slate-50 sm:inline-flex"
+            <button
+              type="button"
+              onClick={toggleTheme}
+              aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+              title={theme === "dark" ? "Light mode" : "Dark mode"}
+              className="grid size-9 place-items-center rounded-lg border border-slate-200 text-slate-700 transition-colors hover:bg-slate-50"
             >
-              Browse services
-            </Link>
+              {theme === "dark" ? (
+                <Sun className="size-[18px]" aria-hidden="true" />
+              ) : (
+                <Moon className="size-[18px]" aria-hidden="true" />
+              )}
+            </button>
+            {user.role !== "technician" ? (
+              <Link
+                href="/services"
+                className="hidden h-9 items-center rounded-full border border-slate-200 bg-white px-4 text-[13px] font-medium text-slate-800 transition-colors hover:bg-slate-50 sm:inline-flex"
+              >
+                Browse services
+              </Link>
+            ) : null}
             <Link
               href="/dashboard/profile"
               aria-label="Your profile"

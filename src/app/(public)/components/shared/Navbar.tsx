@@ -3,12 +3,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ChevronDown,
   LayoutDashboard,
   LogOut,
   Menu,
+  Moon,
+  Sun,
   User,
   X,
 } from "lucide-react";
@@ -51,6 +53,29 @@ export default function Navbar() {
   const pathname = usePathname();
   const { data: session, isPending } = useSession();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      const savedTheme = localStorage.getItem("fixmate-theme");
+      const isDark =
+        savedTheme === "dark" ||
+        (!savedTheme &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches);
+
+      setTheme(isDark ? "dark" : "light");
+    }, 0);
+
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  function toggleTheme() {
+    const nextTheme = theme === "dark" ? "light" : "dark";
+    setTheme(nextTheme);
+    document.documentElement.classList.toggle("dark", nextTheme === "dark");
+    document.documentElement.style.colorScheme = nextTheme;
+    localStorage.setItem("fixmate-theme", nextTheme);
+  }
 
   const user = session?.user;
   const visibleNavLinks =
@@ -116,6 +141,20 @@ export default function Navbar() {
         </nav>
 
         <div className="flex items-center gap-3 lg:justify-self-end">
+          <button
+            type="button"
+            onClick={toggleTheme}
+            aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+            title={theme === "dark" ? "Light mode" : "Dark mode"}
+            className="grid size-10 place-items-center rounded-full border border-slate-200 text-slate-700 transition-colors hover:bg-slate-50"
+          >
+            {theme === "dark" ? (
+              <Sun className="size-[18px]" aria-hidden="true" />
+            ) : (
+              <Moon className="size-[18px]" aria-hidden="true" />
+            )}
+          </button>
+
           <button
             type="button"
             aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
