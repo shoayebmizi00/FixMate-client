@@ -49,7 +49,12 @@ export async function PATCH(
 
   try {
     const jwt = await getBetterAuthJwt(request.headers);
-    const bookingResult = await apiFetch(`/bookings/${encodeURIComponent(id)}`);
+    const bookingResult = await apiFetch(
+      `/bookings/${encodeURIComponent(id)}`,
+      {
+        headers: jwt ? { Authorization: `Bearer ${jwt}` } : {},
+      }
+    );
 
     if (!bookingResult.ok) {
       return NextResponse.json(

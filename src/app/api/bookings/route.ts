@@ -104,7 +104,10 @@ export async function POST(request: Request) {
 
     // One active request per customer per service.
     const existingResult = await apiFetch(
-      `/bookings?customerEmail=${encodeURIComponent(session.user.email)}`
+      `/bookings?customerEmail=${encodeURIComponent(session.user.email)}`,
+      {
+        headers: jwt ? { Authorization: `Bearer ${jwt}` } : {},
+      }
     );
     const existing = Array.isArray(existingResult.data)
       ? (existingResult.data as Booking[])

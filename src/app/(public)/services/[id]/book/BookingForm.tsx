@@ -25,13 +25,11 @@ export default function BookingForm({
   serviceId,
   price,
   customer,
-  testMode,
 }: {
   serviceId: string;
   serviceTitle: string;
   price: number;
   customer: Customer;
-  testMode: boolean;
 }) {
   const router = useRouter();
   const [phone, setPhone] = useState(customer.phone ?? "");
@@ -162,11 +160,9 @@ export default function BookingForm({
           Your starting price is {formatPrice(price)}. The technician sets the
           final amount after the repair, and you pay only then.
         </p>
-        {testMode ? (
-          <p className="mt-2 rounded-md bg-amber-50 px-2.5 py-2 text-[11px] leading-relaxed text-amber-700">
-            Stripe test mode is available after the job is completed.
-          </p>
-        ) : null}
+        <p className="mt-2 rounded-md border border-blue-100 bg-blue-50 px-2.5 py-2 text-[11px] leading-relaxed text-blue-700">
+          Payment card details are entered manually on Stripe Checkout. FixMate never fills or stores them.
+        </p>
       </div>
 
       {error ? (

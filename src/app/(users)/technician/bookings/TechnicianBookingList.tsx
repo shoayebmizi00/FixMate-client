@@ -301,7 +301,7 @@ export default function TechnicianBookingList({
                               The customer will pay this amount after you mark the job completed.
                             </p>
                             <label htmlFor="final-amount" className="mt-5 block text-sm font-medium text-slate-800">
-                              Final amount (USD)
+                              Final amount (BDT)
                             </label>
                             <input
                               id="final-amount"

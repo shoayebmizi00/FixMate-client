@@ -130,6 +130,16 @@ export default function CustomerBookings({
 
   return (
     <div className="space-y-5">
+      {bookings.some((booking) =>
+        normalizeStatus(booking.status) === "completed" &&
+        normalizeStatus(booking.paymentStatus) !== "paid"
+      ) ? (
+        <p className="rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 text-[12.5px] leading-relaxed text-blue-700">
+          For a completed job, Stripe Checkout opens after you select “Pay now”.
+          Enter the card information manually on the Stripe page. Card details are not entered or saved by FixMate.
+        </p>
+      ) : null}
+
       <section className="overflow-hidden rounded-xl border border-slate-200 bg-white">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[760px] text-left">
@@ -185,6 +195,7 @@ export default function CustomerBookings({
                             type="button"
                             onClick={() => payBooking(booking._id)}
                             disabled={savingId === booking._id}
+                            title="Stripe Checkout is opened. Enter the card details manually."
                             className="h-9 rounded-full bg-blue-600 px-4 text-[12.5px] font-semibold text-white hover:bg-blue-700 disabled:opacity-60"
                           >
                             {savingId === booking._id ? "Opening…" : "Pay now"}

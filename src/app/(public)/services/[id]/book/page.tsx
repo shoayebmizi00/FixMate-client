@@ -95,7 +95,6 @@ async function BookingContent({
               email: session.user.email,
               phone: session.user.phone ?? "",
             }}
-            testMode={process.env.STRIPE_SECRET_KEY?.startsWith("sk_test_") ?? false}
           />
         </section>
 

@@ -18,12 +18,12 @@ export default function CtaBanner() {
               Ready when you are
             </p>
             <h2 className="mt-4 max-w-[70%] text-[36px] leading-[1.2] font-semibold tracking-[-0.01em] text-white">
-              Book a repair today and pay securely
-              <br className="hidden sm:block" /> at checkout
+              Book a repair today
+              <br className="hidden sm:block" /> and pay after completion
             </h2>
             <p className="mt-4 max-w-[65%] text-[18px] leading-relaxed text-slate-300">
-              Browse approved repair services, confirm your booking with a card
-              payment, and follow every step until the job is complete.
+              Browse approved repair services, follow every step until the job
+              is complete, then enter your card details manually in Stripe.
             </p>
 
             <div className="mt-8 flex flex-wrap items-center gap-3">

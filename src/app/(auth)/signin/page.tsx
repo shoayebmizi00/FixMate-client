@@ -196,8 +196,8 @@ export default function SignInPage() {
             Your repairs, all in one place.
           </h2>
           <p className="mt-5 text-base leading-relaxed text-blue-100/80">
-            Sign in to book a repair, pay securely by card and follow each
-            status update.
+            Sign in to book a repair, follow each status update and pay securely
+            after the technician completes the job.
           </p>
 
           <ul className="mt-10 space-y-5">

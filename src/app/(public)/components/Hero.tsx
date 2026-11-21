@@ -89,8 +89,8 @@ const categories = [
 
 const guarantees = [
   { icon: ShieldCheck, label: "Transparent pricing" },
-  { icon: HandCoins, label: "Pay securely to book" },
-  { icon: Lock, label: "Secure online payment" },
+  { icon: HandCoins, label: "Pay after completion" },
+  { icon: Lock, label: "Manual secure card payment" },
 ];
 
 export default function Hero() {
@@ -150,7 +150,7 @@ export default function Hero() {
 
             <p className="mt-6 max-w-[520px] text-[17px] leading-relaxed text-slate-300">
               Book trusted repair professionals, track every step of the job, and
-              pay securely by card to confirm your booking.
+              pay securely after the repair is complete.
             </p>
 
             <div className="mt-9 flex flex-wrap items-center gap-3.5">

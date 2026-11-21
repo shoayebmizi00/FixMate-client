@@ -9,7 +9,7 @@ const faqs = [
   {
     question: "When exactly do I pay for a repair?",
     answer:
-      "You pay the starting price when you book, through Stripe's secure card checkout. Your booking and receipt appear in the dashboard, and any difference is settled with the technician after the repair.",
+      "You pay after the technician marks the repair completed. Enter the card details manually on Stripe Checkout; no card information is saved automatically.",
   },
   {
     question: "Can the final price differ from the starting price?",

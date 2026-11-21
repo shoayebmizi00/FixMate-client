@@ -40,7 +40,7 @@ const roles = [
   {
     title: "Customers",
     description:
-      "Browse, request repairs, track progress, cancel while pending, and pay securely by card when you book.",
+      "Browse, request repairs, track progress, cancel while pending, and pay after the technician completes the repair.",
   },
   {
     title: "Technicians",
@@ -166,12 +166,12 @@ export default function AboutPage() {
                 Ready when you are
               </p>
               <h2 className="mt-2 max-w-[70%] text-2xl leading-tight font-semibold tracking-tight text-white sm:text-3xl">
-                Book a repair today and pay securely
-                <br className="hidden sm:block" /> at checkout
+                Book a repair today
+                <br className="hidden sm:block" /> and pay after completion
               </h2>
               <p className="mt-2 max-w-xl text-sm leading-relaxed text-slate-300">
-                Browse approved repair services, confirm your booking with a
-                card payment, and follow every step until the job is complete.
+                Browse approved repair services and follow every step until the
+                job is complete. Enter card details manually in Stripe to pay.
               </p>
               <div className="mt-4 flex flex-wrap items-center gap-2">
                 <Link

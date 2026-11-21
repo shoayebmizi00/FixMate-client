@@ -11,9 +11,9 @@ const steps = [
   {
     number: "02",
     icon: FileText,
-    title: "Pay & send the request",
+    title: "Send the request",
     description:
-      "Add your address and preferred date, then pay securely by card with Stripe to confirm the booking.",
+      "Add your address and preferred date. The technician reviews and accepts the booking.",
   },
   {
     number: "03",

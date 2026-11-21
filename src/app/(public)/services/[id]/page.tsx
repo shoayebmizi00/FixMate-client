@@ -96,9 +96,8 @@ function ServiceDetail({ service, technician }: { service: Service; technician?:
                 {formatPrice(service.basePrice)}
               </p>
               <p className="mt-1 text-xs leading-relaxed text-slate-500">
-                You pay the starting price to confirm the booking. If the final
-                cost differs, it is settled with the technician after the
-                repair.
+                No payment is taken when you send the request. The technician
+                sets the final repair amount after the job is completed.
               </p>
             </div>
           </section>
@@ -122,7 +121,7 @@ function ServiceDetail({ service, technician }: { service: Service; technician?:
               <ul className="mt-3 space-y-3 text-sm leading-relaxed text-slate-600">
                 {[
                   "Sign in and add your address, phone and preferred date.",
-                  "Pay the starting price securely by card to confirm the booking.",
+                  "Send your repair request now and track it in your dashboard.",
                   "Track the repair status from your dashboard until the work is done.",
                 ].map((step) => (
                   <li key={step} className="flex items-start gap-2.5">
@@ -176,8 +175,8 @@ function ServiceDetail({ service, technician }: { service: Service; technician?:
                 Request this repair
               </Link>
               <p className="mt-2 text-center text-[11px] leading-relaxed text-slate-500">
-                Sign in, add your address and pay securely with Stripe to
-                confirm the booking.
+                Sign in and add your address. Pay securely only after the
+                technician completes the repair.
               </p>
             </section>
           </aside>
