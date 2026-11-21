@@ -8,6 +8,8 @@ import {
   ClipboardList,
   LayoutDashboard,
   LogOut,
+  Plus,
+  Settings,
   ShieldCheck,
   User,
   Users,
@@ -34,7 +36,12 @@ const adminLinks = [
   { label: "Overview", href: "/dashboard/admin", icon: LayoutDashboard },
   { label: "Manage users", href: "/dashboard/admin/users", icon: Users },
   {
-    label: "Service approval",
+    label: "All Services",
+    href: "/dashboard/admin/services/all",
+    icon: Wrench,
+  },
+  {
+    label: "Approval requests",
     href: "/dashboard/admin/services",
     icon: ShieldCheck,
   },
@@ -44,6 +51,7 @@ const adminLinks = [
     href: "/dashboard/admin/transactions",
     icon: CircleDollarSign,
   },
+  { label: "Settings", href: "/dashboard/admin/settings", icon: Settings },
   { label: "Profile", href: "/dashboard/profile", icon: User },
 ];
 
@@ -56,6 +64,7 @@ const customerLinks = [
 
 const technicianLinks = [
   { label: "Overview", href: "/dashboard/technician", icon: LayoutDashboard },
+  { label: "Add service", href: "/technician/services/new", icon: Plus },
   { label: "My services", href: "/dashboard/technician/my-services", icon: Wrench },
   { label: "Bookings", href: "/dashboard/technician/requests", icon: ClipboardList },
   {
@@ -84,6 +93,9 @@ function linksForRole(role?: string | null) {
 }
 
 function isLinkActive(pathname: string, href: string) {
+  if (href === "/dashboard/admin/services" && pathname === "/dashboard/admin/services/all") {
+    return false;
+  }
   if (
     href === "/dashboard/admin" ||
     href === "/dashboard/customer" ||

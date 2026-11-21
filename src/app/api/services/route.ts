@@ -89,14 +89,37 @@ export async function POST(request: Request) {
     );
   }
 
-  if (!SERVICE_CATEGORIES.includes(category as (typeof SERVICE_CATEGORIES)[number])) {
+  let customCategories: string[] = [];
+  let customModes: string[] = [];
+
+  try {
+    const settingsResult = await apiFetch("/settings");
+    if (settingsResult.ok) {
+      const settings = settingsResult.data as {
+        categories?: string[];
+        modes?: string[];
+      };
+      customCategories = settings.categories ?? [];
+      customModes = settings.modes ?? [];
+    }
+  } catch {
+    // The standard categories and modes are still available if settings fail.
+  }
+
+  if (
+    !SERVICE_CATEGORIES.includes(category as (typeof SERVICE_CATEGORIES)[number]) &&
+    !customCategories.includes(category)
+  ) {
     return NextResponse.json(
       { error: "Choose a valid category." },
       { status: 400 }
     );
   }
 
-  if (!SERVICE_MODES.includes(serviceMode as (typeof SERVICE_MODES)[number])) {
+  if (
+    !SERVICE_MODES.includes(serviceMode as (typeof SERVICE_MODES)[number]) &&
+    !customModes.includes(serviceMode)
+  ) {
     return NextResponse.json(
       { error: "Choose Home Visit or Shop Drop-off." },
       { status: 400 }

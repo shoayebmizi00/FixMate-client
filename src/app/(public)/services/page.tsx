@@ -1,8 +1,10 @@
 import { Suspense } from "react";
 import { connection } from "next/server";
+import { redirect } from "next/navigation";
 
 import ServiceCatalog from "../components/services/ServiceCatalog";
 import { fetchServicePage, type Service } from "@/lib/services";
+import { getCurrentSession } from "@/lib/session";
 
 type SearchParams = Promise<{
   category?: string | string[];
@@ -103,6 +105,29 @@ export default function ServicesPage({
 }: {
   searchParams: SearchParams;
 }) {
+  const sessionPromise = getCurrentSession();
+
+  // Return technicians to their dashboard. Only customers and visitors can browse services.
+  return (
+    <ServicePageGuard
+      searchParams={searchParams}
+      sessionPromise={sessionPromise}
+    />
+  );
+}
+
+async function ServicePageGuard({
+  searchParams,
+  sessionPromise,
+}: {
+  searchParams: SearchParams;
+  sessionPromise: ReturnType<typeof getCurrentSession>;
+}) {
+  const session = await sessionPromise;
+  if (session?.user.role === "technician") {
+    redirect("/dashboard/technician");
+  }
+
   return (
     <main className="min-h-[65vh] bg-[#f6f9fc] px-4 py-10 font-[family-name:var(--font-geist-sans)] sm:px-6 sm:py-12 lg:px-8">
       <div className="container mx-auto">

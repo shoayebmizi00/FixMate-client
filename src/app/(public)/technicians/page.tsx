@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { connection } from "next/server";
+import { redirect } from "next/navigation";
 import {
   ArrowRight,
   BadgeCheck,
@@ -12,6 +13,7 @@ import {
 } from "lucide-react";
 
 import { fetchTechnicians, type Technician } from "@/lib/technicians";
+import { getCurrentSession } from "@/lib/session";
 
 function getInitials(name: string) {
   return name
@@ -215,7 +217,12 @@ function TechnicianListSkeleton() {
   );
 }
 
-export default function TechniciansPage() {
+export default async function TechniciansPage() {
+  const session = await getCurrentSession();
+  if (session?.user.role === "technician") {
+    redirect("/dashboard/technician");
+  }
+
   return (
     <main className="min-h-[65vh] bg-[#f6f9fc] px-4 py-10 font-[family-name:var(--font-geist-sans)] sm:px-6 sm:py-12 lg:px-8">
       <div className="container mx-auto">

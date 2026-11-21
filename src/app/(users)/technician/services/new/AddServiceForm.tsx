@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, type ChangeEvent, type FormEvent } from "react";
+import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import { ImagePlus, Loader2, ShieldCheck } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
@@ -19,19 +19,38 @@ export default function AddServiceForm() {
   const router = useRouter();
 
   const [title, setTitle] = useState("");
-  const [category, setCategory] = useState<(typeof SERVICE_CATEGORIES)[number]>(
-    SERVICE_CATEGORIES[0]
-  );
+  const [category, setCategory] = useState<string>(SERVICE_CATEGORIES[0]);
   const [price, setPrice] = useState("");
   const [location, setLocation] = useState("");
-  const [serviceMode, setServiceMode] = useState<(typeof SERVICE_MODES)[number]>(
-    SERVICE_MODES[0]
-  );
+  const [serviceMode, setServiceMode] = useState<string>(SERVICE_MODES[0]);
+  const [customCategories, setCustomCategories] = useState<string[]>([]);
+  const [customModes, setCustomModes] = useState<string[]>([]);
   const [estimatedDuration, setEstimatedDuration] = useState("1-2 hours");
   const [description, setDescription] = useState("");
   const [thumbnail, setThumbnail] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    async function loadSettings() {
+      try {
+        const response = await fetch("/api/settings");
+        const data = (await response.json()) as {
+          categories?: string[];
+          modes?: string[];
+        };
+
+        if (response.ok) {
+          setCustomCategories(data.categories ?? []);
+          setCustomModes(data.modes ?? []);
+        }
+      } catch (error) {
+        console.error("Could not load custom service settings:", error);
+      }
+    }
+
+    void loadSettings();
+  }, []);
 
   async function handleUpload(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
@@ -248,15 +267,10 @@ export default function AddServiceForm() {
             <select
               id="service-category"
               value={category}
-              onChange={(event) => {
-                const selected = SERVICE_CATEGORIES.find(
-                  (option) => option === event.target.value
-                );
-                if (selected) setCategory(selected);
-              }}
+              onChange={(event) => setCategory(event.target.value)}
               className={selectClass}
             >
-              {SERVICE_CATEGORIES.map((option) => (
+              {[...SERVICE_CATEGORIES, ...customCategories].map((option) => (
                 <option key={option} value={option}>
                   {option}
                 </option>
@@ -301,15 +315,10 @@ export default function AddServiceForm() {
             <select
               id="service-mode"
               value={serviceMode}
-              onChange={(event) => {
-                const selected = SERVICE_MODES.find(
-                  (option) => option === event.target.value
-                );
-                if (selected) setServiceMode(selected);
-              }}
+              onChange={(event) => setServiceMode(event.target.value)}
               className={selectClass}
             >
-              {SERVICE_MODES.map((option) => (
+              {[...SERVICE_MODES, ...customModes].map((option) => (
                 <option key={option} value={option}>
                   {option}
                 </option>

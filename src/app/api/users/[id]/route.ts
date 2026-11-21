@@ -74,3 +74,53 @@ export async function PATCH(
     );
   }
 }
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const session = await auth.api.getSession({ headers: request.headers });
+
+  if (!session || session.user.role !== "admin") {
+    return NextResponse.json(
+      { error: "Only admins can delete users." },
+      { status: 403 }
+    );
+  }
+
+  const { id } = await params;
+
+  if (!id) {
+    return NextResponse.json({ error: "Invalid user." }, { status: 400 });
+  }
+
+  if (id === session.user.id) {
+    return NextResponse.json(
+      { error: "You cannot delete your own account." },
+      { status: 403 }
+    );
+  }
+
+  try {
+    const jwt = await getBetterAuthJwt(request.headers);
+    const result = await apiFetch(`/users/${encodeURIComponent(id)}`, {
+      method: "DELETE",
+      headers: jwt ? { Authorization: `Bearer ${jwt}` } : {},
+    });
+
+    if (!result.ok) {
+      return NextResponse.json(
+        { error: errorMessage(result.data, "Could not delete the user.") },
+        { status: result.status }
+      );
+    }
+
+    return NextResponse.json({ deleted: true });
+  } catch (error) {
+    console.error("Could not delete the user:", error);
+    return NextResponse.json(
+      { error: "Could not delete the user. Please try again." },
+      { status: 502 }
+    );
+  }
+}

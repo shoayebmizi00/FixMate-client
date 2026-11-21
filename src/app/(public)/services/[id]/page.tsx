@@ -10,10 +10,11 @@ import {
   MapPin,
   ShieldCheck,
 } from "lucide-react";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 import { fetchApprovedServices, type Service } from "@/lib/services";
 import { fetchTechnicians, type Technician } from "@/lib/technicians";
+import { getCurrentSession } from "@/lib/session";
 
 function formatPrice(price: number) {
   return `৳${price.toLocaleString("en-BD", { maximumFractionDigits: 0 })}`;
@@ -261,11 +262,16 @@ async function ServiceDetailContent({
   return <ServiceDetail service={service} technician={technician} />;
 }
 
-export default function ServiceDetailsPage({
+export default async function ServiceDetailsPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const session = await getCurrentSession();
+  if (session?.user.role === "technician") {
+    redirect("/dashboard/technician");
+  }
+
   return (
     <Suspense fallback={<ServiceDetailSkeleton />}>
       <ServiceDetailContent params={params} />

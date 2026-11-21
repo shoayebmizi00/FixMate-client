@@ -33,17 +33,30 @@ export async function PATCH(
     return NextResponse.json({ error: "Invalid booking." }, { status: 400 });
   }
 
-  let body: { status?: string; finalAmount?: number | string };
+  let body: {
+    status?: string;
+    finalAmount?: number | string;
+    customerPhone?: string;
+    address?: string;
+    preferredDate?: string;
+    problemDescription?: string;
+  };
 
   try {
-    body = (await request.json()) as { status?: string; finalAmount?: number | string };
+    body = (await request.json()) as typeof body;
   } catch {
     return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
   }
 
   const nextStatus = normalizeBookingStatus(text(body.status));
+  const isEditRequest =
+    body.status === undefined &&
+    (body.customerPhone !== undefined ||
+      body.address !== undefined ||
+      body.preferredDate !== undefined ||
+      body.problemDescription !== undefined);
 
-  if (!nextStatus) {
+  if (!nextStatus && !isEditRequest) {
     return NextResponse.json({ error: "Choose a status." }, { status: 400 });
   }
 
@@ -82,7 +95,14 @@ export async function PATCH(
         );
       }
 
-      if (nextStatus !== "cancelled" || currentStatus !== "requested") {
+      if (isEditRequest) {
+        if (currentStatus !== "requested") {
+          return NextResponse.json(
+            { error: "You can only edit a booking while it is still requested." },
+            { status: 409 }
+          );
+        }
+      } else if (nextStatus !== "cancelled" || currentStatus !== "requested") {
         return NextResponse.json(
           { error: "You can only cancel a request while it is still requested." },
           { status: 409 }
@@ -126,9 +146,17 @@ export async function PATCH(
         ...(jwt ? { Authorization: `Bearer ${jwt}` } : {}),
       },
       body: JSON.stringify({
-        status: nextStatus,
+        ...(nextStatus ? { status: nextStatus } : {}),
         ...(nextStatus === "completed"
           ? { finalAmount: Number(body.finalAmount) }
+          : {}),
+        ...(isEditRequest
+          ? {
+              customerPhone: text(body.customerPhone),
+              address: text(body.address),
+              preferredDate: text(body.preferredDate),
+              problemDescription: text(body.problemDescription),
+            }
           : {}),
       }),
     });

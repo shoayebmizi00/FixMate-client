@@ -53,6 +53,12 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const user = session?.user;
+  const visibleNavLinks =
+    user?.role === "technician"
+      ? navLinks.filter(
+          (link) => link.href !== "/services" && link.href !== "/technicians"
+        )
+      : navLinks;
 
   async function handleSignOut() {
     try {
@@ -86,7 +92,7 @@ export default function Navbar() {
         </Link>
 
         <nav aria-label="Main navigation" className="hidden items-center gap-10 lg:flex">
-          {navLinks.map((link) => {
+          {visibleNavLinks.map((link) => {
             const isActive =
               pathname === link.href ||
               (link.href !== "/" && pathname.startsWith(`${link.href}/`));
@@ -242,7 +248,7 @@ export default function Navbar() {
       {mobileMenuOpen ? (
         <div className="border-t border-slate-200 bg-white px-4 py-4 shadow-lg lg:hidden">
           <nav aria-label="Mobile navigation" className="container mx-auto space-y-1">
-            {navLinks.map((link) => {
+            {visibleNavLinks.map((link) => {
               const isActive =
                 pathname === link.href ||
                 (link.href !== "/" && pathname.startsWith(`${link.href}/`));

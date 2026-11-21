@@ -68,6 +68,11 @@ export default function CustomerBookings({
   const router = useRouter();
   const [savingId, setSavingId] = useState<string | null>(null);
   const [cancelId, setCancelId] = useState<string | null>(null);
+  const [editId, setEditId] = useState<string | null>(null);
+  const [editPhone, setEditPhone] = useState("");
+  const [editAddress, setEditAddress] = useState("");
+  const [editDate, setEditDate] = useState("");
+  const [editProblem, setEditProblem] = useState("");
 
   async function cancelBooking(bookingId: string) {
     setSavingId(bookingId);
@@ -128,6 +133,70 @@ export default function CustomerBookings({
     }
   }
 
+  function openEdit(booking: Booking) {
+    setEditId(booking._id);
+    setEditPhone(booking.customerPhone ?? "");
+    setEditAddress(booking.address ?? "");
+    setEditDate(booking.preferredDate ?? "");
+    setEditProblem(booking.problemDescription ?? "");
+  }
+
+  async function saveEdit(bookingId: string) {
+    if (!editPhone.trim() || !editAddress.trim() || !editDate) {
+      toast.add({
+        title: "Missing details",
+        description: "Phone, address and preferred date are required.",
+        type: "error",
+      });
+      return;
+    }
+
+    if (editProblem.trim().length < 20) {
+      toast.add({
+        title: "Add more details",
+        description: "Describe the problem in at least 20 characters.",
+        type: "error",
+      });
+      return;
+    }
+
+    setSavingId(bookingId);
+
+    try {
+      const response = await fetch(`/api/bookings/${bookingId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customerPhone: editPhone.trim(),
+          address: editAddress.trim(),
+          preferredDate: editDate,
+          problemDescription: editProblem.trim(),
+        }),
+      });
+      const data = (await response.json()) as { error?: string };
+
+      if (!response.ok) {
+        throw new Error(data.error ?? "Could not edit the booking.");
+      }
+
+      toast.add({
+        title: "Booking updated",
+        description: "Your repair request details were saved.",
+        type: "success",
+      });
+      setEditId(null);
+      router.refresh();
+    } catch (error) {
+      toast.add({
+        title: "Edit failed",
+        description: error instanceof Error ? error.message : "Please try again.",
+        type: "error",
+      });
+    } finally {
+      setSavingId(null);
+    }
+  }
+
   return (
     <div className="space-y-5">
       {bookings.some((booking) =>
@@ -182,13 +251,22 @@ export default function CustomerBookings({
                     <td className="px-5 py-5">
                       <div className="flex justify-end gap-2">
                         {canCancel ? (
-                          <button
-                            type="button"
-                            onClick={() => setCancelId(booking._id)}
-                            className="h-9 rounded-full border border-rose-200 px-4 text-[12.5px] font-semibold text-rose-600 hover:bg-rose-50"
-                          >
-                            Cancel
-                          </button>
+                          <>
+                            <button
+                              type="button"
+                              onClick={() => openEdit(booking)}
+                              className="h-9 rounded-full border border-blue-200 px-4 text-[12.5px] font-semibold text-blue-600 hover:bg-blue-50"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setCancelId(booking._id)}
+                              className="h-9 rounded-full border border-rose-200 px-4 text-[12.5px] font-semibold text-rose-600 hover:bg-rose-50"
+                            >
+                              Cancel
+                            </button>
+                          </>
                         ) : null}
                         {canPay ? (
                           <button
@@ -224,6 +302,85 @@ export default function CustomerBookings({
               </button>
               <button type="button" onClick={() => cancelBooking(cancelId)} disabled={savingId === cancelId} className="h-10 rounded-full bg-rose-600 px-5 text-sm font-semibold text-white disabled:opacity-60">
                 {savingId === cancelId ? "Cancelling…" : "Cancel request"}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {editId ? (
+        <div
+          className="fixed inset-0 z-50 grid place-items-center bg-slate-950/40 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="edit-booking-title"
+        >
+          <div className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-6 shadow-xl">
+            <h2 id="edit-booking-title" className="text-lg font-semibold text-slate-900">
+              Edit repair request
+            </h2>
+            <p className="mt-2 text-sm text-slate-500">
+              You can change these details while the technician has not accepted the job.
+            </p>
+
+            <div className="mt-5 grid gap-4 sm:grid-cols-2">
+              <label className="text-sm font-medium text-slate-800">
+                Phone
+                <input
+                  type="text"
+                  value={editPhone}
+                  onChange={(event) => setEditPhone(event.target.value)}
+                  className="mt-1.5 h-11 w-full rounded-lg border border-slate-200 px-3.5 text-sm outline-none focus:border-blue-400"
+                />
+              </label>
+              <label className="text-sm font-medium text-slate-800">
+                Preferred date
+                <input
+                  type="date"
+                  min={new Date().toISOString().slice(0, 10)}
+                  value={editDate}
+                  onChange={(event) => setEditDate(event.target.value)}
+                  className="mt-1.5 h-11 w-full rounded-lg border border-slate-200 px-3.5 text-sm outline-none focus:border-blue-400"
+                />
+              </label>
+            </div>
+
+            <label className="mt-4 block text-sm font-medium text-slate-800">
+              Repair address
+              <input
+                type="text"
+                value={editAddress}
+                onChange={(event) => setEditAddress(event.target.value)}
+                className="mt-1.5 h-11 w-full rounded-lg border border-slate-200 px-3.5 text-sm outline-none focus:border-blue-400"
+              />
+            </label>
+
+            <label className="mt-4 block text-sm font-medium text-slate-800">
+              Problem description
+              <textarea
+                rows={4}
+                minLength={20}
+                value={editProblem}
+                onChange={(event) => setEditProblem(event.target.value)}
+                className="mt-1.5 w-full rounded-lg border border-slate-200 px-3.5 py-3 text-sm outline-none focus:border-blue-400"
+              />
+            </label>
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setEditId(null)}
+                className="h-10 rounded-full border border-slate-200 px-5 text-sm font-semibold text-slate-700"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => saveEdit(editId)}
+                disabled={savingId === editId}
+                className="h-10 rounded-full bg-blue-600 px-5 text-sm font-semibold text-white disabled:opacity-60"
+              >
+                {savingId === editId ? "Saving…" : "Save changes"}
               </button>
             </div>
           </div>
