@@ -88,6 +88,9 @@ export default function ServiceApprovalList({
             const technicianName = service.technicianId
               ? technicianNames[service.technicianId]
               : undefined;
+            const status = normalizeStatus(service.approvalStatus);
+            const imageUrl = service.image || service.thumbnail;
+            const amount = service.basePrice || service.price;
 
             return (
               <article
@@ -95,11 +98,12 @@ export default function ServiceApprovalList({
                 className="flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-4 sm:flex-row sm:items-center"
               >
                 <div className="relative h-20 w-full shrink-0 overflow-hidden rounded-lg bg-slate-100 sm:w-[104px]">
-                  {service.thumbnail ? (
+                  {imageUrl ? (
                     <Image
-                      src={service.thumbnail}
-                      alt=""
+                      src={imageUrl}
+                      alt={service.title}
                       fill
+                      unoptimized
                       sizes="104px"
                       className="object-cover"
                     />
@@ -125,8 +129,8 @@ export default function ServiceApprovalList({
                   <p className="mt-1 text-[12.5px] text-slate-500">
                     {[
                       technicianName ?? "Unassigned technician",
-                      formatMoney(service.price),
-                      service.location,
+                      formatMoney(amount),
+                      service.serviceArea || service.location,
                     ]
                       .filter(Boolean)
                       .join(" · ")}
@@ -134,24 +138,28 @@ export default function ServiceApprovalList({
                 </div>
 
                 <div className="flex shrink-0 items-center gap-2">
-                  <button
-                    type="button"
-                    disabled={savingId === service._id}
-                    onClick={() => updateStatus(service._id, "approved")}
-                    className="inline-flex h-9 items-center gap-1.5 rounded-full bg-blue-600 px-5 text-[13px] font-semibold text-white transition-colors hover:bg-blue-700 disabled:opacity-60"
-                  >
-                    <Check className="size-4" aria-hidden="true" />
-                    Approve
-                  </button>
-                  <button
-                    type="button"
-                    disabled={savingId === service._id}
-                    onClick={() => updateStatus(service._id, "rejected")}
-                    className="inline-flex h-9 items-center gap-1.5 rounded-full border border-red-200 bg-white px-5 text-[13px] font-semibold text-red-600 transition-colors hover:bg-red-50 disabled:opacity-60"
-                  >
-                    <X className="size-4" aria-hidden="true" />
-                    Reject
-                  </button>
+                  {status !== "approved" ? (
+                    <button
+                      type="button"
+                      disabled={savingId === service._id}
+                      onClick={() => updateStatus(service._id, "approved")}
+                      className="inline-flex h-9 items-center gap-1.5 rounded-full bg-blue-600 px-5 text-[13px] font-semibold text-white transition-colors hover:bg-blue-700 disabled:opacity-60"
+                    >
+                      <Check className="size-4" aria-hidden="true" />
+                      Approve
+                    </button>
+                  ) : null}
+                  {status !== "rejected" ? (
+                    <button
+                      type="button"
+                      disabled={savingId === service._id}
+                      onClick={() => updateStatus(service._id, "rejected")}
+                      className="inline-flex h-9 items-center gap-1.5 rounded-full border border-red-200 bg-white px-5 text-[13px] font-semibold text-red-600 transition-colors hover:bg-red-50 disabled:opacity-60"
+                    >
+                      <X className="size-4" aria-hidden="true" />
+                      Reject
+                    </button>
+                  ) : null}
                 </div>
               </article>
             );
