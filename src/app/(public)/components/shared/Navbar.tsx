@@ -3,7 +3,15 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronDown, LayoutDashboard, LogOut } from "lucide-react";
+import { useState } from "react";
+import {
+  ChevronDown,
+  LayoutDashboard,
+  LogOut,
+  Menu,
+  User,
+  X,
+} from "lucide-react";
 
 import logo from "@/assets/logo.png";
 import { signOut, useSession } from "@/lib/auth-client";
@@ -41,6 +49,7 @@ function getInitials(name?: string | null) {
 export default function Navbar() {
   const pathname = usePathname();
   const { data: session, isPending } = useSession();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const user = session?.user;
 
@@ -50,6 +59,10 @@ export default function Navbar() {
     } finally {
       window.location.reload();
     }
+  }
+
+  function closeMobileMenu() {
+    setMobileMenuOpen(false);
   }
 
   return (
@@ -96,6 +109,20 @@ export default function Navbar() {
         </nav>
 
         <div className="flex items-center gap-3 lg:justify-self-end">
+          <button
+            type="button"
+            aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+            aria-expanded={mobileMenuOpen}
+            onClick={() => setMobileMenuOpen((open) => !open)}
+            className="grid size-10 place-items-center rounded-full border border-slate-200 text-slate-700 lg:hidden"
+          >
+            {mobileMenuOpen ? (
+              <X className="size-5" aria-hidden="true" />
+            ) : (
+              <Menu className="size-5" aria-hidden="true" />
+            )}
+          </button>
+
           {isPending ? (
             <div className="size-10 animate-pulse rounded-full bg-slate-100" />
           ) : user ? (
@@ -121,7 +148,11 @@ export default function Navbar() {
                       {user.name}
                     </span>
                     <span className="text-xs font-normal text-muted-foreground">
-                      {user.role === "technician" ? "Technician" : "Customer"}
+                      {user.role === "admin"
+                        ? "Admin"
+                        : user.role === "technician"
+                          ? "Technician"
+                          : "Customer"}
                     </span>
                   </DropdownMenuLabel>
                 </DropdownMenuGroup>
@@ -129,6 +160,10 @@ export default function Navbar() {
                 <DropdownMenuItem render={<Link href="/dashboard" />}>
                   <LayoutDashboard />
                   Dashboard
+                </DropdownMenuItem>
+                <DropdownMenuItem render={<Link href="/dashboard/profile" />}>
+                  <User />
+                  Update profile
                 </DropdownMenuItem>
                 <DropdownMenuItem variant="destructive" onClick={handleSignOut}>
                   <LogOut />
@@ -160,6 +195,82 @@ export default function Navbar() {
           )}
         </div>
       </div>
+
+      {mobileMenuOpen ? (
+        <div className="border-t border-slate-200 bg-white px-4 py-4 shadow-lg lg:hidden">
+          <nav aria-label="Mobile navigation" className="container mx-auto space-y-1">
+            {navLinks.map((link) => {
+              const isActive =
+                pathname === link.href ||
+                (link.href !== "/" && pathname.startsWith(`${link.href}/`));
+
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={closeMobileMenu}
+                  aria-current={isActive ? "page" : undefined}
+                  className={cn(
+                    "block rounded-lg px-4 py-3 text-sm font-medium",
+                    isActive
+                      ? "bg-blue-50 text-blue-700"
+                      : "text-slate-700 hover:bg-slate-50"
+                  )}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
+
+            {user ? (
+              <>
+                <div className="my-2 border-t border-slate-100" />
+                <Link
+                  href="/dashboard"
+                  onClick={closeMobileMenu}
+                  className="block rounded-lg px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                >
+                  Dashboard
+                </Link>
+                <Link
+                  href="/dashboard/profile"
+                  onClick={closeMobileMenu}
+                  className="block rounded-lg px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                >
+                  Update profile
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => {
+                    closeMobileMenu();
+                    void handleSignOut();
+                  }}
+                  className="block w-full rounded-lg px-4 py-3 text-left text-sm font-medium text-rose-600 hover:bg-rose-50"
+                >
+                  Sign out
+                </button>
+              </>
+            ) : (
+              <div className="grid grid-cols-2 gap-2 border-t border-slate-100 pt-3">
+                <Link
+                  href="/sign-in"
+                  onClick={closeMobileMenu}
+                  className="inline-flex h-10 items-center justify-center rounded-full border border-slate-200 text-sm font-semibold text-slate-700"
+                >
+                  Sign in
+                </Link>
+                <Link
+                  href="/sign-up"
+                  onClick={closeMobileMenu}
+                  className="inline-flex h-10 items-center justify-center rounded-full bg-blue-600 text-sm font-semibold text-white"
+                >
+                  Sign up
+                </Link>
+              </div>
+            )}
+          </nav>
+        </div>
+      ) : null}
     </header>
   );
 }
