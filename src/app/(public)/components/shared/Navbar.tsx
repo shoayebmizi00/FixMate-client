@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { ChevronDown, LayoutDashboard, LogOut } from "lucide-react";
 
 import logo from "@/assets/logo.png";
@@ -40,14 +40,16 @@ function getInitials(name?: string | null) {
 
 export default function Navbar() {
   const pathname = usePathname();
-  const router = useRouter();
   const { data: session, isPending } = useSession();
 
   const user = session?.user;
 
   async function handleSignOut() {
-    await signOut();
-    router.refresh();
+    try {
+      await signOut();
+    } finally {
+      window.location.reload();
+    }
   }
 
   return (

@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { apiFetch, errorMessage } from "@/lib/api";
 import { auth } from "@/lib/auth";
 import type { Service } from "@/lib/types";
+import { getBetterAuthJwt } from "@/lib/server-jwt";
 
 function text(value: unknown) {
   return typeof value === "string" ? value.trim() : "";
@@ -46,6 +47,7 @@ export async function PATCH(
   }
 
   try {
+    const jwt = await getBetterAuthJwt(request.headers);
     const service = await loadService(id);
 
     if (!service) {
@@ -138,7 +140,10 @@ export async function PATCH(
 
     const result = await apiFetch(`/services/${encodeURIComponent(id)}`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...(jwt ? { Authorization: `Bearer ${jwt}` } : {}),
+      },
       body: JSON.stringify(updates),
     });
 
@@ -176,6 +181,7 @@ export async function DELETE(
   }
 
   try {
+    const jwt = await getBetterAuthJwt(_request.headers);
     const service = await loadService(id);
 
     if (!service) {
@@ -196,6 +202,7 @@ export async function DELETE(
 
     const result = await apiFetch(`/services/${encodeURIComponent(id)}`, {
       method: "DELETE",
+      headers: jwt ? { Authorization: `Bearer ${jwt}` } : {},
     });
 
     if (!result.ok) {

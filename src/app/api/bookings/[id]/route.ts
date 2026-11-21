@@ -9,6 +9,7 @@ import {
   TECHNICIAN_TRANSITIONS,
 } from "@/lib/booking-rules";
 import type { Booking } from "@/lib/types";
+import { getBetterAuthJwt } from "@/lib/server-jwt";
 
 function text(value: unknown) {
   return typeof value === "string" ? value.trim() : "";
@@ -47,6 +48,7 @@ export async function PATCH(
   }
 
   try {
+    const jwt = await getBetterAuthJwt(request.headers);
     const bookingResult = await apiFetch(`/bookings/${encodeURIComponent(id)}`);
 
     if (!bookingResult.ok) {
@@ -114,7 +116,10 @@ export async function PATCH(
 
     const updateResult = await apiFetch(`/bookings/${encodeURIComponent(id)}`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...(jwt ? { Authorization: `Bearer ${jwt}` } : {}),
+      },
       body: JSON.stringify({
         status: nextStatus,
         ...(nextStatus === "completed"

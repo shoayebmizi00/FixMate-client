@@ -79,7 +79,8 @@ export async function createBookingCheckout(
 // paid. Safe to call from both the success page and the webhook.
 export async function verifyCheckoutSession(
   sessionId: string,
-  user?: { id: string; email: string }
+  user?: { id: string; email: string },
+  jwt?: string | null
 ): Promise<VerifyResult> {
   const session = await stripe.checkout.sessions.retrieve(sessionId);
 
@@ -93,7 +94,15 @@ export async function verifyCheckoutSession(
     throw new Error("The Stripe session has no booking id.");
   }
 
-  const bookingResult = await apiFetch(`/bookings/${encodeURIComponent(bookingId)}`);
+  const bookingResult = await apiFetch(`/bookings/${encodeURIComponent(bookingId)}`, {
+    headers: {
+      ...(jwt
+        ? { Authorization: `Bearer ${jwt}` }
+        : process.env.INTERNAL_API_SECRET
+          ? { "x-fixmate-internal-secret": process.env.INTERNAL_API_SECRET }
+          : {}),
+    },
+  });
 
   if (!bookingResult.ok) {
     throw new Error("The booking for this payment could not be found.");
@@ -113,7 +122,14 @@ export async function verifyCheckoutSession(
 
   const paymentResult = await apiFetch("/payments", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      ...(jwt
+        ? { Authorization: `Bearer ${jwt}` }
+        : process.env.INTERNAL_API_SECRET
+          ? { "x-fixmate-internal-secret": process.env.INTERNAL_API_SECRET }
+          : {}),
+    },
     body: JSON.stringify({
       bookingId: booking._id,
       serviceTitle: booking.serviceTitle,
@@ -141,7 +157,14 @@ export async function verifyCheckoutSession(
       `/bookings/${encodeURIComponent(booking._id)}`,
       {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(jwt
+            ? { Authorization: `Bearer ${jwt}` }
+            : process.env.INTERNAL_API_SECRET
+              ? { "x-fixmate-internal-secret": process.env.INTERNAL_API_SECRET }
+              : {}),
+        },
         body: JSON.stringify({ paymentStatus: "paid" }),
       }
     );

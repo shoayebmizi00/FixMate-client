@@ -4,6 +4,7 @@ import { apiFetch, errorMessage } from "@/lib/api";
 import { auth } from "@/lib/auth";
 import { isActiveStatus } from "@/lib/booking-rules";
 import type { Booking, Service } from "@/lib/types";
+import { getBetterAuthJwt } from "@/lib/server-jwt";
 
 function text(value: unknown) {
   return typeof value === "string" ? value.trim() : "";
@@ -70,6 +71,7 @@ export async function POST(request: Request) {
   }
 
   try {
+    const jwt = await getBetterAuthJwt(request.headers);
     const serviceResult = await apiFetch(
       `/services/${encodeURIComponent(serviceId)}`
     );
@@ -122,7 +124,10 @@ export async function POST(request: Request) {
 
     const createResult = await apiFetch("/bookings", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...(jwt ? { Authorization: `Bearer ${jwt}` } : {}),
+      },
       body: JSON.stringify({
         serviceId: service._id,
         serviceTitle: service.title,

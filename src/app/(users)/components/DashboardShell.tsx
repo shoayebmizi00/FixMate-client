@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import {
   CircleDollarSign,
   ClipboardList,
@@ -103,7 +103,6 @@ export default function DashboardShell({
   children: ReactNode;
 }) {
   const pathname = usePathname();
-  const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const links = linksForRole(user.role);
   const roleLabel =
@@ -114,9 +113,11 @@ export default function DashboardShell({
         : "Customer";
 
   async function handleSignOut() {
-    await signOut();
-    router.push("/sign-in");
-    router.refresh();
+    try {
+      await signOut();
+    } finally {
+      window.location.reload();
+    }
   }
 
   return (

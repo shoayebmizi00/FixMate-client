@@ -4,6 +4,7 @@ import { apiFetch } from "@/lib/api";
 import { auth } from "@/lib/auth";
 import { createBookingCheckout } from "@/lib/payments";
 import type { Booking } from "@/lib/types";
+import { getBetterAuthJwt } from "@/lib/server-jwt";
 
 function text(value: unknown) {
   return typeof value === "string" ? value.trim() : "";
@@ -40,7 +41,10 @@ export async function POST(request: Request) {
   }
 
   try {
-    const bookingResult = await apiFetch(`/bookings/${encodeURIComponent(bookingId)}`);
+    const jwt = await getBetterAuthJwt(request.headers);
+    const bookingResult = await apiFetch(`/bookings/${encodeURIComponent(bookingId)}`, {
+      headers: jwt ? { Authorization: `Bearer ${jwt}` } : {},
+    });
 
     if (!bookingResult.ok) {
       return NextResponse.json({ error: "Booking not found." }, { status: 404 });

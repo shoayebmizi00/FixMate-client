@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { apiFetch, errorMessage } from "@/lib/api";
 import { auth } from "@/lib/auth";
+import { getBetterAuthJwt } from "@/lib/server-jwt";
 
 const ROLES = ["customer", "technician", "admin"];
 
@@ -47,9 +48,13 @@ export async function PATCH(
   }
 
   try {
+    const jwt = await getBetterAuthJwt(request.headers);
     const result = await apiFetch(`/users/${encodeURIComponent(id)}`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...(jwt ? { Authorization: `Bearer ${jwt}` } : {}),
+      },
       body: JSON.stringify({ role }),
     });
 

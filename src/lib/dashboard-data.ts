@@ -1,4 +1,6 @@
 import { connection } from "next/server";
+import { headers } from "next/headers";
+import { getBetterAuthJwt } from "@/lib/server-jwt";
 
 import type {
   Booking,
@@ -56,8 +58,12 @@ function apiBaseUrl() {
 
 async function fetchList(path: string): Promise<unknown[]> {
   await connection();
+  const jwt = await getBetterAuthJwt(await headers());
 
-  const response = await fetch(`${apiBaseUrl()}${path}`, { cache: "no-store" });
+  const response = await fetch(`${apiBaseUrl()}${path}`, {
+    cache: "no-store",
+    headers: jwt ? { Authorization: `Bearer ${jwt}` } : {},
+  });
 
   if (!response.ok) {
     throw new Error(`${path} request failed: ${response.status}`);
@@ -97,9 +103,11 @@ export async function fetchAllPayments(): Promise<Payment[]> {
 
 export async function fetchBookingById(id: string): Promise<Booking | null> {
   await connection();
+  const jwt = await getBetterAuthJwt(await headers());
 
   const response = await fetch(`${apiBaseUrl()}/bookings/${encodeURIComponent(id)}`, {
     cache: "no-store",
+    headers: jwt ? { Authorization: `Bearer ${jwt}` } : {},
   });
 
   if (response.status === 404) return null;

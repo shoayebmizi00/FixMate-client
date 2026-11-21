@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { auth } from "@/lib/auth";
 import { verifyCheckoutSession } from "@/lib/payments";
+import { getBetterAuthJwt } from "@/lib/server-jwt";
 
 // The success page and the webhook both use the same verification helper.
 export async function GET(request: Request) {
@@ -22,10 +23,11 @@ export async function GET(request: Request) {
   }
 
   try {
+    const jwt = await getBetterAuthJwt(request.headers);
     const result = await verifyCheckoutSession(sessionId, {
       id: session.user.id,
       email: session.user.email,
-    });
+    }, jwt);
 
     if (result.status === "unpaid") {
       return NextResponse.json({ status: "unpaid" });

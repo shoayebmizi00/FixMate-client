@@ -9,6 +9,7 @@ Customers can discover approved repair services and send repair requests. Techni
 ## Main features
 
 - BetterAuth email/password authentication
+- BetterAuth JWT plugin tokens and Express Bearer-token role middleware
 - Customer, technician, and admin dashboards
 - Technician service CRUD and admin approval
 - Server-side service search, filters, sorting, and pagination

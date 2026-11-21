@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import { connection } from "next/server";
+import { headers } from "next/headers";
 import { CheckCircle2, TriangleAlert } from "lucide-react";
 import { redirect } from "next/navigation";
 
 import { verifyCheckoutSession } from "@/lib/payments";
 import { getCurrentSession } from "@/lib/session";
+import { getBetterAuthJwt } from "@/lib/server-jwt";
 
 async function SuccessContent({
   searchParams,
@@ -28,10 +30,11 @@ async function SuccessContent({
 
   let result;
   try {
+    const jwt = await getBetterAuthJwt(await headers());
     result = await verifyCheckoutSession(sessionId, {
       id: session.user.id,
       email: session.user.email,
-    });
+    }, jwt);
   } catch (error) {
     console.error("Could not verify checkout:", error);
     return (
