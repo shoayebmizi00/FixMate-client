@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { ReceiptText } from "lucide-react";
 
-import { fetchAllTransactions, type Transaction } from "@/lib/dashboard-data";
+import { fetchAllPayments, type Payment } from "@/lib/dashboard-data";
 import { requireRole } from "@/lib/session";
 import {
   EmptyState,
@@ -11,17 +11,17 @@ import {
   normalizeStatus,
 } from "../../components/dashboard-ui";
 
-function transactionReference(transaction: Transaction) {
-  return transaction.reference ?? transaction._id.slice(-8).toUpperCase();
+function transactionReference(transaction: Payment) {
+  return transaction.transactionId ?? transaction.stripeSessionId ?? transaction._id.slice(-8).toUpperCase();
 }
 
 async function TransactionsContent() {
   await requireRole("admin");
 
-  let transactions: Transaction[] = [];
+  let transactions: Payment[] = [];
 
   try {
-    transactions = await fetchAllTransactions();
+    transactions = await fetchAllPayments();
   } catch (error) {
     console.error("Could not load transactions:", error);
 
@@ -36,7 +36,7 @@ async function TransactionsContent() {
   }
 
   const verified = transactions.filter(
-    (transaction) => normalizeStatus(transaction.status) === "verified"
+    (transaction) => normalizeStatus(transaction.paymentStatus) === "paid"
   );
   const revenue = verified.reduce(
     (total, transaction) => total + (transaction.amount ?? 0),
@@ -91,7 +91,7 @@ async function TransactionsContent() {
                       {transaction.technicianName ?? "—"}
                     </td>
                     <td className="px-5 py-5 capitalize">
-                      {transaction.method ?? "—"}
+                      Card (Stripe)
                     </td>
                     <td className="px-5 py-5">
                       {formatDate(transaction.createdAt)}

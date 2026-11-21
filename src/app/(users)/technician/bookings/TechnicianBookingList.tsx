@@ -108,6 +108,9 @@ export default function TechnicianBookingList({
   const router = useRouter();
   const [activeFilter, setActiveFilter] = useState("all");
   const [savingId, setSavingId] = useState<string | null>(null);
+  const [completionId, setCompletionId] = useState<string | null>(null);
+  const [finalAmount, setFinalAmount] = useState("");
+  const [rejectId, setRejectId] = useState<string | null>(null);
 
   const sortedBookings = [...bookings].sort(
     (first, second) =>
@@ -129,7 +132,12 @@ export default function TechnicianBookingList({
       const response = await fetch(`/api/bookings/${booking._id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: action.status }),
+        body: JSON.stringify({
+          status: action.status,
+          ...(action.status === "completed"
+            ? { finalAmount: Number(finalAmount) }
+            : {}),
+        }),
       });
       const data = (await response.json()) as { error?: string };
 
@@ -143,6 +151,9 @@ export default function TechnicianBookingList({
         type: "success",
       });
       router.refresh();
+      setCompletionId(null);
+      setRejectId(null);
+      setFinalAmount("");
     } catch (error) {
       toast.add({
         title: "Update failed",
@@ -193,6 +204,21 @@ export default function TechnicianBookingList({
                       {customerName(booking)}
                       {email ? ` · ${email}` : ""}
                     </p>
+                    {booking.customerPhone ? (
+                      <p className="mt-1 text-[12.5px] text-slate-500">
+                        Phone: {booking.customerPhone}
+                      </p>
+                    ) : null}
+                    {booking.address ? (
+                      <p className="mt-1 text-[12.5px] text-slate-500">
+                        Address: {booking.address}
+                      </p>
+                    ) : null}
+                    {booking.problemDescription ? (
+                      <p className="mt-2 max-w-2xl text-[12.5px] leading-relaxed text-slate-600">
+                        Problem: {booking.problemDescription}
+                      </p>
+                    ) : null}
                     <p className="mt-1 text-[12px] text-slate-400">
                       Requested {formatDate(booking.createdAt)} · Preferred{" "}
                       {formatDate(booking.preferredDate)}
@@ -223,7 +249,22 @@ export default function TechnicianBookingList({
                           <button
                             key={action.status}
                             type="button"
-                            onClick={() => updateStatus(booking, action)}
+                            onClick={() => {
+                              if (action.status === "completed") {
+                                setCompletionId(booking._id);
+                                setFinalAmount(
+                                  String(
+                                    booking.finalAmount && booking.finalAmount > 0
+                                      ? booking.finalAmount
+                                      : booking.basePrice
+                                  )
+                                );
+                              } else if (action.status === "rejected") {
+                                setRejectId(booking._id);
+                              } else {
+                                void updateStatus(booking, action);
+                              }
+                            }}
                             disabled={isSaving}
                             className={
                               action.variant === "danger"
@@ -245,6 +286,76 @@ export default function TechnicianBookingList({
                       })}
                     </div>
                   )}
+
+                  {completionId ? (
+                    (() => {
+                      const booking = bookings.find((item) => item._id === completionId);
+                      if (!booking) return null;
+                      const action = actionsForStatus("in progress")[0];
+
+                      return (
+                        <div className="fixed inset-0 z-50 grid place-items-center bg-slate-950/40 p-4" role="dialog" aria-modal="true" aria-labelledby="complete-title">
+                          <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-xl">
+                            <h2 id="complete-title" className="text-lg font-semibold text-slate-900">Set the final repair amount</h2>
+                            <p className="mt-2 text-sm text-slate-500">
+                              The customer will pay this amount after you mark the job completed.
+                            </p>
+                            <label htmlFor="final-amount" className="mt-5 block text-sm font-medium text-slate-800">
+                              Final amount (USD)
+                            </label>
+                            <input
+                              id="final-amount"
+                              type="number"
+                              min="0.01"
+                              step="0.01"
+                              value={finalAmount}
+                              onChange={(event) => setFinalAmount(event.target.value)}
+                              className="mt-1.5 h-11 w-full rounded-lg border border-slate-200 px-3.5 text-sm outline-none focus:border-blue-400"
+                            />
+                            <div className="mt-6 flex justify-end gap-3">
+                              <button type="button" onClick={() => setCompletionId(null)} className="h-10 rounded-full border border-slate-200 px-5 text-sm font-semibold text-slate-700">
+                                Cancel
+                              </button>
+                              <button
+                                type="button"
+                                disabled={Number(finalAmount) <= 0 || savingId === completionId}
+                                onClick={() => void updateStatus(booking, action)}
+                                className="h-10 rounded-full bg-blue-600 px-5 text-sm font-semibold text-white disabled:opacity-60"
+                              >
+                                {savingId === completionId ? "Saving…" : "Mark completed"}
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })()
+                  ) : null}
+
+                  {rejectId ? (
+                    <div className="fixed inset-0 z-50 grid place-items-center bg-slate-950/40 p-4" role="dialog" aria-modal="true" aria-labelledby="reject-title">
+                      <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-xl">
+                        <h2 id="reject-title" className="text-lg font-semibold text-slate-900">Reject this repair request?</h2>
+                        <p className="mt-2 text-sm leading-relaxed text-slate-500">The customer will see that the request was rejected.</p>
+                        <div className="mt-6 flex justify-end gap-3">
+                          <button type="button" onClick={() => setRejectId(null)} className="h-10 rounded-full border border-slate-200 px-5 text-sm font-semibold text-slate-700">Keep request</button>
+                          <button
+                            type="button"
+                            disabled={savingId === rejectId}
+                            onClick={() => {
+                              const booking = bookings.find((item) => item._id === rejectId);
+                              if (booking) {
+                                const action = actionsForStatus("requested").find((item) => item.status === "rejected");
+                                if (action) void updateStatus(booking, action);
+                              }
+                            }}
+                            className="h-10 rounded-full bg-rose-600 px-5 text-sm font-semibold text-white disabled:opacity-60"
+                          >
+                            {savingId === rejectId ? "Saving…" : "Reject request"}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ) : null}
                 </div>
               </article>
             );

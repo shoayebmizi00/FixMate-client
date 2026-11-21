@@ -85,10 +85,10 @@ function TechnicianCard({ technician }: { technician: Technician }) {
             />
           </h2>
 
-          {technician.location ? (
+          {technician.area ? (
             <p className="mt-1.5 flex items-center gap-1 text-[13px] text-slate-600">
               <MapPin className="size-3.5 shrink-0 text-slate-400" aria-hidden="true" />
-              {technician.location}
+              {technician.area}
             </p>
           ) : null}
         </div>
@@ -179,7 +179,7 @@ async function TechnicianList() {
           up here once they are approved.
         </p>
         <Link
-          href="/signup"
+          href="/sign-up"
           className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 transition-colors hover:text-blue-700"
         >
           Join as a technician

@@ -5,11 +5,9 @@ import { cn } from "@/lib/utils";
 export function formatMoney(value?: number) {
   const amount = typeof value === "number" ? value : 0;
 
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 2,
-  }).format(amount);
+  return `৳${amount.toLocaleString("en-BD", {
+    maximumFractionDigits: 0,
+  })}`;
 }
 
 export function formatDate(value?: string) {

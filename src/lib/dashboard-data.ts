@@ -1,68 +1,14 @@
 import { connection } from "next/server";
 
-export type DashboardUser = {
-  _id: string;
-  name: string;
-  email: string;
-  role?: string;
-  image?: string;
-  phone?: string;
-  serviceArea?: string;
-  bio?: string;
-  createdAt?: string;
-};
+import type {
+  Booking,
+  DashboardUser,
+  Payment,
+  Service,
+} from "@/lib/types";
 
-export type DashboardService = {
-  _id: string;
-  title: string;
-  slug?: string;
-  category?: string;
-  description?: string;
-  price?: number;
-  estimatedDuration?: string;
-  thumbnail?: string;
-  images?: string[];
-  location?: string;
-  serviceMode?: string;
-  serviceType?: string;
-  mode?: string;
-  approvalStatus?: string;
-  isActive?: boolean;
-  technicianId?: string;
-  createdAt?: string;
-};
-
-export type Booking = {
-  _id: string;
-  serviceId?: string;
-  serviceTitle?: string;
-  service?: { title?: string };
-  customerId?: string;
-  customerName?: string;
-  customerEmail?: string;
-  customer?: { name?: string; email?: string };
-  technicianId?: string;
-  technicianName?: string;
-  technician?: { name?: string };
-  preferredDate?: string;
-  status?: string;
-  paymentStatus?: string;
-  amount?: number;
-  createdAt?: string;
-};
-
-export type Transaction = {
-  _id: string;
-  bookingId?: string;
-  customerId?: string;
-  customerName?: string;
-  technicianName?: string;
-  amount?: number;
-  status?: string;
-  method?: string;
-  reference?: string;
-  createdAt?: string;
-};
+export type { Booking, DashboardUser, Payment, Service };
+export type DashboardService = Service;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
@@ -77,39 +23,56 @@ function isUser(value: unknown): value is DashboardUser {
   );
 }
 
-function isService(value: unknown): value is DashboardService {
+function isService(value: unknown): value is Service {
   return (
     isRecord(value) &&
     typeof value._id === "string" &&
-    typeof value.title === "string"
+    typeof value.title === "string" &&
+    typeof value.basePrice === "number"
   );
 }
 
 function isBooking(value: unknown): value is Booking {
-  return isRecord(value) && typeof value._id === "string";
+  return (
+    isRecord(value) &&
+    typeof value._id === "string" &&
+    typeof value.serviceTitle === "string"
+  );
 }
 
-function isTransaction(value: unknown): value is Transaction {
-  return isRecord(value) && typeof value._id === "string";
+function isPayment(value: unknown): value is Payment {
+  return (
+    isRecord(value) &&
+    typeof value._id === "string" &&
+    typeof value.amount === "number"
+  );
 }
 
-// Calls one list endpoint on the FixMate API and always returns an array.
+function apiBaseUrl() {
+  const baseUrl = process.env.BASE_API_URL;
+  if (!baseUrl) throw new Error("BASE_API_URL is not configured.");
+  return baseUrl.replace(/\/$/, "");
+}
+
 async function fetchList(path: string): Promise<unknown[]> {
   await connection();
 
-  const baseUrl = process.env.BASE_API_URL;
-  if (!baseUrl) throw new Error("BASE_API_URL is not configured.");
-
-  const response = await fetch(`${baseUrl.replace(/\/$/, "")}${path}`, {
-    cache: "no-store",
-  });
+  const response = await fetch(`${apiBaseUrl()}${path}`, { cache: "no-store" });
 
   if (!response.ok) {
     throw new Error(`${path} request failed: ${response.status}`);
   }
 
   const data: unknown = await response.json();
-  return Array.isArray(data) ? data : [];
+
+  if (Array.isArray(data)) return data;
+
+  // `/services` returns a paginated envelope.
+  if (isRecord(data) && Array.isArray(data.services)) {
+    return data.services;
+  }
+
+  return [];
 }
 
 export async function fetchAllUsers(): Promise<DashboardUser[]> {
@@ -117,8 +80,8 @@ export async function fetchAllUsers(): Promise<DashboardUser[]> {
   return data.filter(isUser);
 }
 
-export async function fetchAllServices(): Promise<DashboardService[]> {
-  const data = await fetchList("/services");
+export async function fetchAllServices(): Promise<Service[]> {
+  const data = await fetchList("/services?all=true&limit=100");
   return data.filter(isService);
 }
 
@@ -127,7 +90,23 @@ export async function fetchAllBookings(): Promise<Booking[]> {
   return data.filter(isBooking);
 }
 
-export async function fetchAllTransactions(): Promise<Transaction[]> {
-  const data = await fetchList("/transactions");
-  return data.filter(isTransaction);
+export async function fetchAllPayments(): Promise<Payment[]> {
+  const data = await fetchList("/payments");
+  return data.filter(isPayment);
+}
+
+export async function fetchBookingById(id: string): Promise<Booking | null> {
+  await connection();
+
+  const response = await fetch(`${apiBaseUrl()}/bookings/${encodeURIComponent(id)}`, {
+    cache: "no-store",
+  });
+
+  if (response.status === 404) return null;
+  if (!response.ok) {
+    throw new Error(`Booking request failed: ${response.status}`);
+  }
+
+  const data: unknown = await response.json();
+  return isBooking(data) ? data : null;
 }

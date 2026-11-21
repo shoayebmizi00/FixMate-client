@@ -88,10 +88,10 @@ function TechnicianProfile({ technician }: { technician: Technician }) {
               />
             </h1>
 
-            {technician.location ? (
+            {technician.area ? (
               <p className="mt-2 flex items-center gap-1 text-sm text-slate-600">
                 <MapPin className="size-4 shrink-0 text-slate-400" aria-hidden="true" />
-                {technician.location}
+                {technician.area}
               </p>
             ) : null}
 

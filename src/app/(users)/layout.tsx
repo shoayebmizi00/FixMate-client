@@ -40,7 +40,7 @@ async function DashboardFrame({ children }: { children: ReactNode }) {
   const session = await getCurrentSession();
 
   if (!session) {
-    redirect("/signin");
+    redirect("/sign-in");
   }
 
   return (

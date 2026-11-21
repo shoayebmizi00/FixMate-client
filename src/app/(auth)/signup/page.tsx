@@ -29,14 +29,9 @@ import logo from "@/assets/logo.png";
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const passwordRules = [
-  { label: "At least 8 characters", test: (value: string) => value.length >= 8 },
+  { label: "At least 6 characters", test: (value: string) => value.length >= 6 },
   { label: "Uppercase letter", test: (value: string) => /[A-Z]/.test(value) },
   { label: "Lowercase letter", test: (value: string) => /[a-z]/.test(value) },
-  { label: "Number", test: (value: string) => /\d/.test(value) },
-  {
-    label: "Special character",
-    test: (value: string) => /[^A-Za-z0-9]/.test(value),
-  },
 ];
 
 const inputClass =
@@ -384,7 +379,7 @@ export default function SignUpPage() {
               <p className="mt-2 text-sm text-slate-500">
                 Already have an account?{" "}
                 <Link
-                  href="/signin"
+                  href="/sign-in"
                   className="font-semibold text-blue-600 transition-colors hover:text-blue-700"
                 >
                   Sign in

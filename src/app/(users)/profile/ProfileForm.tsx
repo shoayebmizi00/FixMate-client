@@ -16,7 +16,7 @@ type ProfileUser = {
   role?: string | null;
   image?: string | null;
   phone?: string | null;
-  serviceArea?: string | null;
+  area?: string | null;
   bio?: string | null;
 };
 
@@ -27,7 +27,7 @@ export default function ProfileForm({ user }: { user: ProfileUser }) {
   const router = useRouter();
   const [name, setName] = useState(user.name ?? "");
   const [phone, setPhone] = useState(user.phone ?? "");
-  const [serviceArea, setServiceArea] = useState(user.serviceArea ?? "");
+  const [serviceArea, setServiceArea] = useState(user.area ?? "");
   const [bio, setBio] = useState(user.bio ?? "");
   const [imageUrl, setImageUrl] = useState(user.image ?? "");
   const [isUploading, setIsUploading] = useState(false);
@@ -100,7 +100,7 @@ export default function ProfileForm({ user }: { user: ProfileUser }) {
     const { error } = await authClient.updateUser({
       name: name.trim(),
       phone: phone.trim(),
-      serviceArea: serviceArea.trim(),
+      area: serviceArea.trim(),
       bio: bio.trim(),
       image: imageUrl || undefined,
     });

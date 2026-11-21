@@ -29,6 +29,7 @@ import {
   formatMoney,
   normalizeStatus,
 } from "../../../components/dashboard-ui";
+import ServiceActions from "./ServiceActions";
 
 function SummaryCard({
   label,
@@ -227,6 +228,10 @@ async function ServiceDetailsContent({
                 Manage bookings
               </Link>
             </div>
+            <ServiceActions
+              serviceId={service._id}
+              isAvailable={service.isAvailable}
+            />
 
             {!approved ? (
               <p className="mt-4 rounded-lg bg-amber-50 px-3.5 py-3 text-[12.5px] leading-relaxed text-amber-800">

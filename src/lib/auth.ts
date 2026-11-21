@@ -5,10 +5,18 @@ import { mongodbAdapter } from "@better-auth/mongo-adapter";
 const client = new MongoClient(process.env.MONGODB_URI as string);
 const db = client.db("fixmate");
 
+const trustedOrigins = [
+  process.env.BETTER_AUTH_URL,
+  ...(process.env.BETTER_AUTH_TRUSTED_ORIGINS ?? "").split(","),
+]
+  .map((origin) => origin?.trim())
+  .filter((origin): origin is string => Boolean(origin));
+
 export const auth = betterAuth({
   database: mongodbAdapter(db, {
     client,
   }),
+  trustedOrigins,
   user: {
     additionalFields: {
       role: {
@@ -22,7 +30,7 @@ export const auth = betterAuth({
         required: false,
         input: true,
       },
-      serviceArea: {
+      area: {
         type: "string",
         required: false,
         input: true,
@@ -34,17 +42,40 @@ export const auth = betterAuth({
       },
     },
   },
-  emailAndPassword: { 
-    enabled: true, 
-  }, 
-  socialProviders: { 
-    github: { 
-      clientId: process.env.GITHUB_CLIENT_ID as string, 
-      clientSecret: process.env.GITHUB_CLIENT_SECRET as string, 
-    }, 
-    google: { 
-      clientId: process.env.GOOGLE_CLIENT_ID as string, 
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string, 
-    }, 
-  }, 
+  databaseHooks: {
+    user: {
+      create: {
+        // A visitor may choose customer or technician. Anything else (for
+        // example a crafted "admin" request) falls back to customer.
+        before: async (user) => {
+          const requested = String((user as { role?: unknown }).role ?? "customer");
+          const role = requested === "technician" ? "technician" : "customer";
+
+          return { data: { ...user, role } };
+        },
+      },
+      update: {
+        // Roles are changed only through the protected admin API. A normal
+        // profile update must never be able to promote the account.
+        before: async (user) => {
+          const rest = { ...(user as Record<string, unknown>) };
+          delete rest.role;
+          return { data: rest };
+        },
+      },
+    },
+  },
+  emailAndPassword: {
+    enabled: true,
+  },
+  socialProviders: {
+    github: {
+      clientId: process.env.GITHUB_CLIENT_ID as string,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
+    },
+    google: {
+      clientId: process.env.GOOGLE_CLIENT_ID as string,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+    },
+  },
 });

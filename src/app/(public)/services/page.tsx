@@ -2,10 +2,14 @@ import { Suspense } from "react";
 import { connection } from "next/server";
 
 import ServiceCatalog from "../components/services/ServiceCatalog";
-import { fetchApprovedServices, type Service } from "@/lib/services";
+import { fetchServicePage, type Service } from "@/lib/services";
 
 type SearchParams = Promise<{
   category?: string | string[];
+  search?: string | string[];
+  mode?: string | string[];
+  sort?: string | string[];
+  page?: string | string[];
 }>;
 
 async function ServiceResults({
@@ -14,7 +18,13 @@ async function ServiceResults({
   searchParams: SearchParams;
 }) {
   let category = "";
-  let services: Service[];
+  let search = "";
+  let mode = "";
+  let sort = "newest";
+  let page = 1;
+  let services: Service[] = [];
+  let total = 0;
+  let pages = 1;
 
   // `searchParams` is request-time data. This must stay outside the try/catch:
   // during prerendering `connection()` rejects to abort this render, and if the
@@ -22,12 +32,23 @@ async function ServiceResults({
   await connection();
 
   try {
-    const [params, approvedServices] = await Promise.all([
-      searchParams,
-      fetchApprovedServices(),
-    ]);
+    const params = await searchParams;
     category = typeof params.category === "string" ? params.category : "";
-    services = approvedServices;
+    search = typeof params.search === "string" ? params.search : "";
+    mode = typeof params.mode === "string" ? params.mode : "";
+    sort = typeof params.sort === "string" ? params.sort : "newest";
+    page = typeof params.page === "string" ? Math.max(1, Number(params.page) || 1) : 1;
+    const result = await fetchServicePage({
+      category: category || undefined,
+      search: search || undefined,
+      mode: mode || undefined,
+      sort,
+      page,
+      limit: 12,
+    });
+    services = result.services;
+    total = result.total;
+    pages = result.pages;
   } catch (error) {
     console.error("Could not load services:", error);
     return (
@@ -45,6 +66,12 @@ async function ServiceResults({
       key={category}
       services={services}
       initialCategory={category}
+      initialSearch={search}
+      initialMode={mode}
+      initialSort={sort}
+      page={page}
+      pages={pages}
+      total={total}
     />
   );
 }

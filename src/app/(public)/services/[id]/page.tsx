@@ -13,14 +13,14 @@ import {
 import { notFound } from "next/navigation";
 
 import { fetchApprovedServices, type Service } from "@/lib/services";
+import { fetchTechnicians, type Technician } from "@/lib/technicians";
 
 function formatPrice(price: number) {
-  return `৳${price.toLocaleString("en-BD")}`;
+  return `৳${price.toLocaleString("en-BD", { maximumFractionDigits: 0 })}`;
 }
 
-function ServiceDetail({ service }: { service: Service }) {
-  const serviceMode =
-    service.serviceMode ?? service.serviceType ?? service.mode;
+function ServiceDetail({ service, technician }: { service: Service; technician?: Technician }) {
+  const serviceMode = service.serviceMode ?? "";
 
   return (
     <main className="min-h-[65vh] bg-[#f6f9fc] px-4 py-8 font-[family-name:var(--font-geist-sans)] sm:px-6 sm:py-10 lg:px-8">
@@ -38,9 +38,9 @@ function ServiceDetail({ service }: { service: Service }) {
 
         <div className="grid gap-5 md:grid-cols-[1.25fr_0.9fr]">
           <div className="relative aspect-[1.5] overflow-hidden rounded-2xl bg-slate-200">
-            {service.thumbnail ? (
+            {service.image ? (
               <Image
-                src={service.thumbnail}
+                src={service.image}
                 alt={`${service.title} repair`}
                 fill
                 priority
@@ -74,10 +74,10 @@ function ServiceDetail({ service }: { service: Service }) {
                 <Clock3 className="size-3.5" aria-hidden="true" />
                 {service.estimatedDuration}
               </span>
-              {service.location && (
+              {service.serviceArea && (
                 <span className="inline-flex items-center gap-1.5">
                   <MapPin className="size-3.5" aria-hidden="true" />
-                  {service.location}
+                  {service.serviceArea}
                 </span>
               )}
               {serviceMode && (
@@ -93,7 +93,7 @@ function ServiceDetail({ service }: { service: Service }) {
                 Starting price
               </p>
               <p className="mt-1 text-2xl font-bold text-slate-900">
-                {formatPrice(service.price)}
+                {formatPrice(service.basePrice)}
               </p>
               <p className="mt-1 text-xs leading-relaxed text-slate-500">
                 You pay the starting price to confirm the booking. If the final
@@ -144,17 +144,24 @@ function ServiceDetail({ service }: { service: Service }) {
               </p>
               <div className="mt-3 flex items-center gap-3">
                 <span className="grid size-10 shrink-0 place-items-center rounded-full bg-blue-50 text-blue-700">
-                  <ShieldCheck className="size-5" aria-hidden="true" />
+                  {technician?.image ? (
+                    <Image src={technician.image} alt="" width={40} height={40} unoptimized className="size-10 rounded-full object-cover" />
+                  ) : (
+                    <ShieldCheck className="size-5" aria-hidden="true" />
+                  )}
                 </span>
                 <div>
                   <p className="text-sm font-semibold text-slate-900">
-                    Verified service provider
+                    {technician?.name || service.technicianName || "Verified service provider"}
                   </p>
                   <p className="mt-0.5 text-xs text-slate-500">
-                    Technician details are shared after they review your request.
+                    {technician?.area || service.serviceArea || "FixMate technician"}
                   </p>
                 </div>
               </div>
+              {technician?.bio ? (
+                <p className="mt-3 text-xs leading-relaxed text-slate-600">{technician.bio}</p>
+              ) : null}
               <p className="mt-4 text-xs leading-relaxed text-slate-500">
                 This service listing is approved by FixMate. The individual
                 technician profile is not included in the available service data.
@@ -215,9 +222,11 @@ async function ServiceDetailContent({
 
   const { id } = await params;
   let services: Service[];
+  let technicians: Technician[] = [];
 
   try {
     services = await fetchApprovedServices();
+    technicians = await fetchTechnicians();
   } catch (error) {
     console.error("Could not load service details:", error);
     return (
@@ -244,8 +253,13 @@ async function ServiceDetailContent({
     (item) => item._id === id || item.slug === id
   );
   if (!service) notFound();
+  const technician = technicians.find(
+    (item) =>
+      item.id === service.technicianId ||
+      item.email?.toLowerCase() === service.technicianEmail?.toLowerCase()
+  );
 
-  return <ServiceDetail service={service} />;
+  return <ServiceDetail service={service} technician={technician} />;
 }
 
 export default function ServiceDetailsPage({

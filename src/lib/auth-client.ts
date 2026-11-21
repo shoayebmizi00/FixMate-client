@@ -1,12 +1,12 @@
 import { createAuthClient } from "better-auth/react";
-import { inferAdditionalFields } from "better-auth/client/plugins";
+import { inferAdditionalFields, jwtClient } from "better-auth/client/plugins";
 import type { auth } from "@/lib/auth";
 
 // One client for the whole app.
 // No baseURL is passed, so the client talks to this same Next.js app
 // (the auth endpoints live in src/app/api/auth/[...all]/route.ts).
 export const authClient = createAuthClient({
-  plugins: [inferAdditionalFields<typeof auth>()],
+  plugins: [inferAdditionalFields<typeof auth>(), jwtClient()],
 });
 
 // Small aliases so pages can import { signIn } instead of authClient.signIn.

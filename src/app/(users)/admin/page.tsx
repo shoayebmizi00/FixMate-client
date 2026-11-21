@@ -11,12 +11,12 @@ import type { ReactNode } from "react";
 import {
   fetchAllBookings,
   fetchAllServices,
-  fetchAllTransactions,
+  fetchAllPayments,
   fetchAllUsers,
   type Booking,
   type DashboardService,
   type DashboardUser,
-  type Transaction,
+  type Payment,
 } from "@/lib/dashboard-data";
 import { requireRole } from "@/lib/session";
 import {
@@ -158,14 +158,14 @@ async function AdminOverview() {
   let users: DashboardUser[] = [];
   let services: DashboardService[] = [];
   let bookings: Booking[] = [];
-  let transactions: Transaction[] = [];
+  let transactions: Payment[] = [];
 
   try {
     [users, services, bookings, transactions] = await Promise.all([
       fetchAllUsers(),
       fetchAllServices(),
       fetchAllBookings(),
-      fetchAllTransactions(),
+      fetchAllPayments(),
     ]);
   } catch (error) {
     console.error("Could not load the admin overview:", error);
@@ -187,7 +187,7 @@ async function AdminOverview() {
     (service) => normalizeStatus(service.approvalStatus) !== "approved"
   ).length;
   const verifiedRevenue = transactions
-    .filter((transaction) => normalizeStatus(transaction.status) === "verified")
+    .filter((transaction) => normalizeStatus(transaction.paymentStatus) === "paid")
     .reduce((total, transaction) => total + (transaction.amount ?? 0), 0);
 
   const latestBookings = [...bookings]

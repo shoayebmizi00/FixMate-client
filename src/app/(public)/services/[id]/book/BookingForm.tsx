@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import type { FormEvent } from "react";
-import { CreditCard, LoaderCircle, Lock } from "lucide-react";
+import { useState, type FormEvent } from "react";
+import { useRouter } from "next/navigation";
+import { ClipboardCheck, LoaderCircle } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/toast";
@@ -18,12 +18,11 @@ const fieldClass =
   "h-11 rounded-lg border-slate-200 bg-white px-3.5 text-sm text-slate-900";
 
 function formatPrice(price: number) {
-  return `৳${price.toLocaleString("en-BD")}`;
+  return `৳${price.toLocaleString("en-BD", { maximumFractionDigits: 0 })}`;
 }
 
 export default function BookingForm({
   serviceId,
-  serviceTitle,
   price,
   customer,
   testMode,
@@ -34,173 +33,144 @@ export default function BookingForm({
   customer: Customer;
   testMode: boolean;
 }) {
-  const [fullName, setFullName] = useState(customer.name);
+  const router = useRouter();
   const [phone, setPhone] = useState(customer.phone ?? "");
   const [address, setAddress] = useState("");
   const [preferredDate, setPreferredDate] = useState("");
-  const [notes, setNotes] = useState("");
+  const [problemDescription, setProblemDescription] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  function todayString() {
+    const today = new Date();
+    return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+  }
+
+  async function submitRequest(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);
 
-    if (!fullName.trim() || !phone.trim() || !address.trim() || !preferredDate) {
-      setError("Add your name, phone, address and preferred date to continue.");
+    if (!phone.trim() || !address.trim() || !preferredDate) {
+      setError("Add your phone, address and preferred date to continue.");
+      return;
+    }
+
+    if (problemDescription.trim().length < 20) {
+      setError("Describe the problem in at least 20 characters.");
+      return;
+    }
+
+    if (preferredDate < todayString()) {
+      setError("Choose today or a future date.");
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      const response = await fetch("/api/checkout_sessions", {
+      const response = await fetch("/api/bookings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           serviceId,
-          fullName: fullName.trim(),
           phone: phone.trim(),
           address: address.trim(),
           preferredDate,
-          notes: notes.trim(),
+          problemDescription: problemDescription.trim(),
         }),
       });
 
-      const data = (await response.json()) as { url?: string; error?: string };
+      const data = (await response.json()) as { error?: string };
 
-      if (!response.ok || !data.url) {
-        throw new Error(data.error ?? "Could not start the payment.");
+      if (!response.ok) {
+        throw new Error(data.error ?? "Could not create the repair request.");
       }
 
-      // Stripe Checkout is hosted on Stripe's own page.
-      window.location.assign(data.url);
-    } catch (checkoutError) {
-      const message =
-        checkoutError instanceof Error
-          ? checkoutError.message
-          : "Could not start the payment.";
-
-      setError(message);
-      setIsSubmitting(false);
-
       toast.add({
-        title: "Payment could not start",
+        title: "Repair request sent",
+        description: "The technician can now review your request.",
+        type: "success",
+      });
+      router.push("/dashboard/customer/bookings");
+    } catch (requestError) {
+      const message =
+        requestError instanceof Error
+          ? requestError.message
+          : "Could not create the repair request.";
+      setError(message);
+      toast.add({
+        title: "Request could not be sent",
         description: message,
         type: "error",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mt-5 space-y-4">
+    <form onSubmit={submitRequest} className="mt-5 space-y-4">
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label htmlFor="booking-name" className={labelClass}>
-            Full name
-          </label>
-          <Input
-            id="booking-name"
-            value={fullName}
-            onChange={(event) => setFullName(event.target.value)}
-            className={fieldClass}
-            placeholder="Name on the booking"
-            required
-          />
+          <label htmlFor="booking-name" className={labelClass}>Full name</label>
+          <Input id="booking-name" value={customer.name} readOnly className={`${fieldClass} bg-slate-50 text-slate-500`} />
         </div>
-
         <div>
-          <label htmlFor="booking-phone" className={labelClass}>
-            Phone
-          </label>
-          <Input
-            id="booking-phone"
-            value={phone}
-            onChange={(event) => setPhone(event.target.value)}
-            className={fieldClass}
-            placeholder="Contact number"
-            required
-          />
+          <label htmlFor="booking-phone" className={labelClass}>Phone</label>
+          <Input id="booking-phone" value={phone} onChange={(event) => setPhone(event.target.value)} className={fieldClass} placeholder="Contact number" required />
         </div>
       </div>
 
       <div>
-        <label htmlFor="booking-email" className={labelClass}>
-          Email
-        </label>
-        <Input
-          id="booking-email"
-          value={customer.email}
-          readOnly
-          className={`${fieldClass} bg-slate-50 text-slate-500`}
-        />
+        <label htmlFor="booking-email" className={labelClass}>Email</label>
+        <Input id="booking-email" value={customer.email} readOnly className={`${fieldClass} bg-slate-50 text-slate-500`} />
       </div>
 
       <div>
-        <label htmlFor="booking-address" className={labelClass}>
-          Repair address
-        </label>
-        <Input
-          id="booking-address"
-          value={address}
-          onChange={(event) => setAddress(event.target.value)}
-          className={fieldClass}
-          placeholder="House, road, area and city"
-          required
-        />
+        <label htmlFor="booking-address" className={labelClass}>Repair address</label>
+        <Input id="booking-address" value={address} onChange={(event) => setAddress(event.target.value)} className={fieldClass} placeholder="House, road, area and city" required />
       </div>
 
       <div>
-        <label htmlFor="booking-date" className={labelClass}>
-          Preferred date
-        </label>
-        <Input
-          id="booking-date"
-          type="date"
-          value={preferredDate}
-          onChange={(event) => setPreferredDate(event.target.value)}
-          className={fieldClass}
-          required
-        />
+        <label htmlFor="booking-date" className={labelClass}>Preferred date</label>
+        <Input id="booking-date" type="date" min={todayString()} value={preferredDate} onChange={(event) => setPreferredDate(event.target.value)} className={fieldClass} required />
       </div>
 
       <div>
-        <label htmlFor="booking-notes" className={labelClass}>
-          Notes for the technician <span className="text-slate-400">(optional)</span>
+        <label htmlFor="booking-problem" className={labelClass}>
+          Problem description <span className="text-slate-400">(at least 20 characters)</span>
         </label>
         <textarea
-          id="booking-notes"
-          value={notes}
-          onChange={(event) => setNotes(event.target.value)}
-          rows={3}
-          maxLength={400}
-          placeholder="Describe the issue, for example: the screen is cracked but still works."
+          id="booking-problem"
+          value={problemDescription}
+          onChange={(event) => setProblemDescription(event.target.value)}
+          rows={4}
+          minLength={20}
+          maxLength={2000}
+          required
+          placeholder="Describe the fault and what has already been tried."
           className="w-full rounded-lg border border-slate-200 bg-white px-3.5 py-3 text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:border-blue-400"
         />
       </div>
 
       <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
         <p className="flex items-center gap-2 text-[13px] font-semibold text-slate-900">
-          <CreditCard className="size-4 text-blue-600" aria-hidden="true" />
-          Card payment
+          <ClipboardCheck className="size-4 text-blue-600" aria-hidden="true" />
+          Pay only after completion
         </p>
         <p className="mt-1.5 text-xs leading-relaxed text-slate-500">
-          You will enter your card on Stripe&apos;s secure page for{" "}
-          {formatPrice(price)}.
+          Your starting price is {formatPrice(price)}. The technician sets the
+          final amount after the repair, and you pay only then.
         </p>
-
         {testMode ? (
           <p className="mt-2 rounded-md bg-amber-50 px-2.5 py-2 text-[11px] leading-relaxed text-amber-700">
-            Test mode: use card 4242 4242 4242 4242, any future expiry date and
-            any CVC.
+            Stripe test mode is available after the job is completed.
           </p>
         ) : null}
       </div>
 
       {error ? (
-        <p role="alert" className="text-[12.5px] font-medium text-rose-600">
-          {error}
-        </p>
+        <p role="alert" className="text-[12.5px] font-medium text-rose-600">{error}</p>
       ) : null}
 
       <button
@@ -211,19 +181,17 @@ export default function BookingForm({
         {isSubmitting ? (
           <>
             <LoaderCircle className="size-4 animate-spin" aria-hidden="true" />
-            Opening secure checkout…
+            Sending request…
           </>
         ) : (
           <>
-            <Lock className="size-4" aria-hidden="true" />
-            Pay {formatPrice(price)} &amp; book {serviceTitle}
+            <ClipboardCheck className="size-4" aria-hidden="true" />
+            Send repair request
           </>
         )}
       </button>
-
       <p className="text-center text-[11px] leading-relaxed text-slate-500">
-        Payments are processed by Stripe. FixMate never stores your card
-        details.
+        No card payment is taken when this request is created.
       </p>
     </form>
   );

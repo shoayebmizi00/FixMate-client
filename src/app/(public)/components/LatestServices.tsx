@@ -3,75 +3,16 @@ import Link from "next/link";
 import { connection } from "next/server";
 import { ArrowUpRight, BadgeCheck, Clock3 } from "lucide-react";
 
-import airConditionerFallback from "@/assets/5.png";
-
-const unavailableAirConditionerThumbnail =
-  "https://images.unsplash.com/photo-1631545806609-7e8e7f4a7f8a";
-
-type Service = {
-  _id: string;
-  title: string;
-  slug: string;
-  category: string;
-  price: number;
-  estimatedDuration: string;
-  thumbnail?: string;
-  isActive: boolean;
-  approvalStatus: string;
-  createdAt?: string;
-};
-
-function isService(value: unknown): value is Service {
-  if (typeof value !== "object" || value === null) return false;
-
-  const service = value as Record<string, unknown>;
-  return (
-    typeof service._id === "string" &&
-    typeof service.title === "string" &&
-    typeof service.slug === "string" &&
-    typeof service.category === "string" &&
-    typeof service.price === "number" &&
-    typeof service.estimatedDuration === "string" &&
-    typeof service.isActive === "boolean" &&
-    typeof service.approvalStatus === "string" &&
-    (service.thumbnail === undefined || typeof service.thumbnail === "string") &&
-    (service.createdAt === undefined || typeof service.createdAt === "string")
-  );
-}
+import type { Service } from "@/lib/types";
+import { fetchServicePage } from "@/lib/services";
 
 async function fetchLatestServices() {
   // Wait for an actual request so this fetch is not left in flight when the
   // static shell finishes prerendering.
   await connection();
 
-  const baseUrl = process.env.BASE_API_URL;
-  if (!baseUrl) throw new Error("BASE_API_URL is not configured.");
-
-  const response = await fetch(`${baseUrl.replace(/\/$/, "")}/services`);
-  if (!response.ok) throw new Error(`Services request failed: ${response.status}`);
-
-  const data: unknown = await response.json();
-  if (!Array.isArray(data)) throw new Error("Services response is invalid.");
-
-  return data
-    .filter(isService)
-    .filter(
-      (service) =>
-        service.isActive && service.approvalStatus.toLowerCase() === "approved"
-    )
-    .sort(
-      (first, second) =>
-        new Date(second.createdAt ?? 0).getTime() -
-        new Date(first.createdAt ?? 0).getTime()
-    )
-    .slice(0, 6)
-    .map((service) => ({
-      ...service,
-      thumbnail:
-        service.thumbnail === unavailableAirConditionerThumbnail
-          ? airConditionerFallback.src
-          : service.thumbnail,
-    }));
+  const page = await fetchServicePage({ limit: 6, sort: "newest" });
+  return page.services;
 }
 
 export default async function LatestServices() {
@@ -134,9 +75,9 @@ export default async function LatestServices() {
                   aria-label={`View ${service.title}`}
                   className="relative block aspect-[1.4] overflow-hidden bg-slate-100"
                 >
-                  {service.thumbnail ? (
+                  {service.image ? (
                     <Image
-                      src={service.thumbnail}
+                      src={service.image}
                       alt=""
                       fill
                       sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
@@ -174,7 +115,7 @@ export default async function LatestServices() {
                         Starting at
                       </p>
                       <p className="mt-0.5 text-lg font-bold text-slate-900">
-                        ৳{service.price.toLocaleString("en-BD")}
+                        ৳{service.basePrice.toLocaleString("en-BD", { maximumFractionDigits: 0 })}
                       </p>
                     </div>
                     <Link

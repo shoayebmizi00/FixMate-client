@@ -77,7 +77,7 @@ export default function AboutPage() {
                 <ArrowRight className="size-3.5" aria-hidden="true" />
               </Link>
               <Link
-                href="/signup"
+                href="/sign-up"
                 className="inline-flex h-10 items-center justify-center rounded-full border border-slate-200 bg-white px-5 text-sm font-semibold text-slate-700 transition-colors hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
               >
                 Join as a technician
@@ -182,7 +182,7 @@ export default function AboutPage() {
                   <ArrowRight className="size-3" aria-hidden="true" />
                 </Link>
                 <Link
-                  href="/signup"
+                  href="/sign-up"
                   className="inline-flex h-9 items-center justify-center rounded-full border border-white/25 bg-transparent px-4 text-xs font-medium text-white transition-colors hover:bg-white/10"
                 >
                   Create an account

@@ -13,8 +13,10 @@ import {
   Users,
   Wallet,
   Wrench,
+  Menu,
+  X,
 } from "lucide-react";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 
 import logo from "@/assets/logo.png";
 import { signOut } from "@/lib/auth-client";
@@ -29,39 +31,39 @@ export type DashboardShellUser = {
 };
 
 const adminLinks = [
-  { label: "Overview", href: "/admin", icon: LayoutDashboard },
-  { label: "Manage users", href: "/admin/manage-users", icon: Users },
+  { label: "Overview", href: "/dashboard/admin", icon: LayoutDashboard },
+  { label: "Manage users", href: "/dashboard/admin/users", icon: Users },
   {
     label: "Service approval",
-    href: "/admin/service-approval",
+    href: "/dashboard/admin/services",
     icon: ShieldCheck,
   },
-  { label: "All bookings", href: "/admin/all-bookings", icon: ClipboardList },
+  { label: "All bookings", href: "/dashboard/admin/bookings", icon: ClipboardList },
   {
     label: "Transactions",
-    href: "/admin/transactions",
+    href: "/dashboard/admin/transactions",
     icon: CircleDollarSign,
   },
-  { label: "Profile", href: "/profile", icon: User },
+  { label: "Profile", href: "/dashboard/profile", icon: User },
 ];
 
 const customerLinks = [
-  { label: "Overview", href: "/customer", icon: LayoutDashboard },
-  { label: "My bookings", href: "/customer/bookings", icon: ClipboardList },
-  { label: "Payments", href: "/customer/payments", icon: Wallet },
-  { label: "Profile", href: "/profile", icon: User },
+  { label: "Overview", href: "/dashboard/customer", icon: LayoutDashboard },
+  { label: "My bookings", href: "/dashboard/customer/bookings", icon: ClipboardList },
+  { label: "Payments", href: "/dashboard/customer/payments", icon: Wallet },
+  { label: "Profile", href: "/dashboard/profile", icon: User },
 ];
 
 const technicianLinks = [
-  { label: "Overview", href: "/technician", icon: LayoutDashboard },
-  { label: "My services", href: "/technician/services", icon: Wrench },
-  { label: "Bookings", href: "/technician/bookings", icon: ClipboardList },
+  { label: "Overview", href: "/dashboard/technician", icon: LayoutDashboard },
+  { label: "My services", href: "/dashboard/technician/my-services", icon: Wrench },
+  { label: "Bookings", href: "/dashboard/technician/requests", icon: ClipboardList },
   {
     label: "Earnings",
     href: "/technician/earnings",
     icon: CircleDollarSign,
   },
-  { label: "Profile", href: "/profile", icon: User },
+  { label: "Profile", href: "/dashboard/profile", icon: User },
 ];
 
 function getInitials(name?: string | null) {
@@ -82,7 +84,11 @@ function linksForRole(role?: string | null) {
 }
 
 function isLinkActive(pathname: string, href: string) {
-  if (href === "/admin" || href === "/customer" || href === "/technician") {
+  if (
+    href === "/dashboard/admin" ||
+    href === "/dashboard/customer" ||
+    href === "/dashboard/technician"
+  ) {
     return pathname === href;
   }
 
@@ -98,6 +104,7 @@ export default function DashboardShell({
 }) {
   const pathname = usePathname();
   const router = useRouter();
+  const [menuOpen, setMenuOpen] = useState(false);
   const links = linksForRole(user.role);
   const roleLabel =
     user.role === "admin"
@@ -108,13 +115,21 @@ export default function DashboardShell({
 
   async function handleSignOut() {
     await signOut();
-    router.push("/signin");
+    router.push("/sign-in");
     router.refresh();
   }
 
   return (
     <div className="flex min-h-dvh bg-[#f6f9fc] font-[family-name:var(--font-geist-sans)]">
-      <aside className="sticky top-0 hidden h-dvh w-[253px] shrink-0 flex-col border-r border-slate-200 bg-white lg:flex">
+      {menuOpen ? (
+        <button
+          type="button"
+          aria-label="Close dashboard menu"
+          onClick={() => setMenuOpen(false)}
+          className="fixed inset-0 z-40 bg-slate-950/30 lg:hidden"
+        />
+      ) : null}
+      <aside className={`${menuOpen ? "fixed inset-y-0 left-0 z-50 flex" : "hidden"} h-dvh w-[253px] shrink-0 flex-col border-r border-slate-200 bg-white lg:sticky lg:top-0 lg:flex`}>
         <Link href="/">
           <div className="flex h-[72px] items-center gap-3 px-6">
             <span className="relative size-10 shrink-0 overflow-hidden rounded-xl ring-1 ring-slate-900/5">
@@ -196,7 +211,17 @@ export default function DashboardShell({
 
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-40 flex h-[72px] items-center justify-between gap-4 border-b border-slate-200 bg-white px-4 sm:px-6 lg:px-8">
-          <p className="text-[15px] font-medium text-slate-500">Dashboard</p>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              aria-label={menuOpen ? "Close dashboard menu" : "Open dashboard menu"}
+              onClick={() => setMenuOpen((open) => !open)}
+              className="grid size-9 place-items-center rounded-lg border border-slate-200 text-slate-700 lg:hidden"
+            >
+              {menuOpen ? <X className="size-5" /> : <Menu className="size-5" />}
+            </button>
+            <p className="text-[15px] font-medium text-slate-500">Dashboard</p>
+          </div>
 
           <div className="flex items-center gap-3">
             <Link
@@ -206,7 +231,7 @@ export default function DashboardShell({
               Browse services
             </Link>
             <Link
-              href="/profile"
+              href="/dashboard/profile"
               aria-label="Your profile"
               className="relative flex size-9 items-center justify-center overflow-hidden rounded-full bg-slate-900 text-[11px] font-semibold text-white"
             >
@@ -228,7 +253,7 @@ export default function DashboardShell({
 
         <nav
           aria-label="Dashboard"
-          className="flex gap-2 overflow-x-auto border-b border-slate-200 bg-white px-4 py-3 lg:hidden"
+          className="hidden"
         >
           {links.map((link) => {
             const active = isLinkActive(pathname, link.href);

@@ -137,7 +137,7 @@ export default function Navbar() {
           ) : (
             <>
               <Link
-                href="/signin"
+                href="/sign-in"
                 className={cn(
                   buttonVariants({ variant: "ghost", size: "lg" }),
                   "hidden h-10 px-4 text-slate-700 sm:inline-flex"
@@ -146,7 +146,7 @@ export default function Navbar() {
                 Sign In
               </Link>
               <Link
-                href="/signup"
+                href="/sign-up"
                 className={cn(
                   buttonVariants({ size: "lg" }),
                   "h-10 rounded-full px-5"

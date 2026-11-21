@@ -8,7 +8,7 @@ const quickLinks = [
   { label: "Home", href: "/" },
   { label: "Browse services", href: "/services" },
   { label: "About FixMate", href: "/about" },
-  { label: "Sign in", href: "/signin" },
+  { label: "Sign in", href: "/sign-in" },
 ];
 
 const popularRepairs = [

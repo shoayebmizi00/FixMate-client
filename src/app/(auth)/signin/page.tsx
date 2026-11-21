@@ -392,7 +392,7 @@ export default function SignInPage() {
             <p className="mt-6 text-center text-sm text-slate-500">
               New to FixMate?{" "}
               <Link
-                href="/signup"
+                href="/sign-up"
                 className="font-semibold text-blue-600 transition-colors hover:text-blue-700"
               >
                 Create an account

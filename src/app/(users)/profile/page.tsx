@@ -15,7 +15,7 @@ async function ProfileContent() {
         role: session.user.role,
         image: session.user.image,
         phone: session.user.phone,
-        serviceArea: session.user.serviceArea,
+        area: session.user.area,
         bio: session.user.bio,
       }}
     />

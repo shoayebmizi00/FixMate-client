@@ -11,7 +11,7 @@ import { getCurrentSession } from "@/lib/session";
 import BookingForm from "./BookingForm";
 
 function formatPrice(price: number) {
-  return `৳${price.toLocaleString("en-BD")}`;
+  return `৳${price.toLocaleString("en-BD", { maximumFractionDigits: 0 })}`;
 }
 
 async function BookingContent({
@@ -24,7 +24,7 @@ async function BookingContent({
 
   // Send signed-out visitors to sign in, then bring them straight back here.
   if (!session) {
-    redirect(`/signin?next=${encodeURIComponent(`/services/${id}/book`)}`);
+    redirect(`/sign-in?next=${encodeURIComponent(`/services/${id}/book`)}`);
   }
 
   const role = session.user.role ?? "customer";
@@ -54,8 +54,7 @@ async function BookingContent({
 
   if (!service) notFound();
 
-  const serviceMode =
-    service.serviceMode ?? service.serviceType ?? service.mode ?? "Home visit";
+  const serviceMode = service.serviceMode ?? "Home visit";
 
   return (
     <div className="space-y-5">
@@ -83,14 +82,14 @@ async function BookingContent({
             Confirm your booking
           </h1>
           <p className="mt-1.5 text-sm leading-relaxed text-slate-500">
-            Add the repair address and preferred date. Payment is handled
-            securely by Stripe before the booking is sent to the technician.
+            Add the repair address and preferred date. The technician sets the
+            final amount after the repair, and payment is handled securely by Stripe.
           </p>
 
           <BookingForm
             serviceId={service._id}
             serviceTitle={service.title}
-            price={service.price}
+            price={service.basePrice}
             customer={{
               name: session.user.name,
               email: session.user.email,
@@ -103,9 +102,9 @@ async function BookingContent({
         <aside className="space-y-4 self-start md:sticky md:top-24">
           <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
             <div className="relative aspect-[1.6] bg-slate-200">
-              {service.thumbnail ? (
+              {service.image ? (
                 <Image
-                  src={service.thumbnail}
+                  src={service.image}
                   alt={`${service.title} repair`}
                   fill
                   sizes="(min-width: 768px) 38vw, 100vw"
@@ -131,10 +130,10 @@ async function BookingContent({
                   <Clock3 className="size-3.5" aria-hidden="true" />
                   {service.estimatedDuration}
                 </span>
-                {service.location && (
+                {service.serviceArea && (
                   <span className="inline-flex items-center gap-1.5">
                     <MapPin className="size-3.5" aria-hidden="true" />
-                    {service.location}
+                    {service.serviceArea}
                   </span>
                 )}
                 <span className="inline-flex items-center gap-1.5">
@@ -144,15 +143,15 @@ async function BookingContent({
               </div>
 
               <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-4">
-                <span className="text-sm text-slate-600">Total due today</span>
+                <span className="text-sm text-slate-600">Starting price</span>
                 <span className="text-lg font-bold text-slate-900">
-                  {formatPrice(service.price)}
+                  {formatPrice(service.basePrice)}
                 </span>
               </div>
 
               <p className="mt-2 text-[11px] leading-relaxed text-slate-500">
-                You pay the starting price now to confirm the booking. Any
-                difference is settled with the technician after the repair.
+                You do not pay now. After the repair is completed, the
+                technician sets the final amount and you pay securely.
               </p>
             </div>
           </section>

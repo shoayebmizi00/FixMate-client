@@ -1,36 +1,90 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# FixMate
 
-## Getting Started
+FixMate is a role-based repair and home appliance service platform built with Next.js, Express, MongoDB, BetterAuth, ImgBB, and Stripe.
 
-First, run the development server:
+## Purpose
+
+Customers can discover approved repair services and send repair requests. Technicians manage their listings and job status. Admins approve listings and manage users and bookings. Customers pay only after a repair is completed.
+
+## Main features
+
+- BetterAuth email/password authentication
+- Customer, technician, and admin dashboards
+- Technician service CRUD and admin approval
+- Server-side service search, filters, sorting, and pagination
+- Requested → accepted → in-progress → completed booking pipeline
+- Stripe Checkout and idempotent Stripe webhook/payment verification
+- ImgBB profile and service image uploads
+- Responsive public and dashboard interfaces
+
+## Local setup
+
+Client:
 
 ```bash
+cd fixmate-client
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Server:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+cd fixMate-server
+npm install
+node index.js
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Required environment variables
 
-## Learn More
+Client:
 
-To learn more about Next.js, take a look at the following resources:
+- `MONGODB_URI`
+- `BETTER_AUTH_SECRET`
+- `BETTER_AUTH_URL`
+- `BETTER_AUTH_TRUSTED_ORIGINS`
+- `BASE_API_URL`
+- `IMAGEBB_API_KEY`
+- `STRIPE_SECRET_KEY`
+- `STRIPE_WEBHOOK_SECRET`
+- `GOOGLE_CLIENT_ID`
+- `GOOGLE_CLIENT_SECRET`
+- `GITHUB_CLIENT_ID`
+- `GITHUB_CLIENT_SECRET`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Express:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `MONGODB_URI`
+- `CLIENT_URL`
+- `PORT`
 
-## Deploy on Vercel
+## Data collections
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The application uses four MongoDB collections: `user`, `services`, `bookings`, and `payments`. BetterAuth session, account, and verification collections are authentication collections and are not counted as application collections.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Verification commands
+
+```bash
+npm run lint
+npx tsc --noEmit
+npm run build
+```
+
+## Stripe test card
+
+Use `4242 4242 4242 4242`, a future expiry date, and any CVC.
+
+## Currency
+
+FixMate uses Bangladeshi Taka (`৳` / `bdt`) for displayed and Stripe Checkout prices.
+
+## Submission details
+
+Add these values before the live submission:
+
+- Live site URL:
+- Admin email/password:
+- Technician email/password:
+- Customer email/password:
+- GitHub client repository:
+- GitHub server repository:

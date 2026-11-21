@@ -2,7 +2,13 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getSessionCookie } from "better-auth/cookies";
 
-const protectedPrefixes = ["/admin", "/customer", "/technician", "/profile"];
+const protectedPrefixes = [
+  "/dashboard",
+  "/admin",
+  "/customer",
+  "/technician",
+  "/profile",
+];
 
 function isProtectedPath(pathname: string) {
   if (pathname === "/dashboard") return true;
@@ -30,7 +36,7 @@ export function proxy(request: NextRequest) {
   const hasSession = Boolean(getSessionCookie(request));
 
   if (!hasSession && isProtectedPath(pathname)) {
-    const signInUrl = new URL("/signin", request.url);
+    const signInUrl = new URL("/sign-in", request.url);
     signInUrl.searchParams.set("next", `${pathname}${search}`);
 
     return NextResponse.redirect(signInUrl);
@@ -43,6 +49,7 @@ export const config = {
   matcher: [
     "/service/:path*",
     "/dashboard",
+    "/dashboard/:path*",
     "/admin/:path*",
     "/customer/:path*",
     "/technician/:path*",
