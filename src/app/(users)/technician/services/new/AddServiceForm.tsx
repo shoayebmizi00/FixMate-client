@@ -8,34 +8,25 @@ import { ImagePlus, Loader2, ShieldCheck } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/toast";
+import { SERVICE_CATEGORIES, SERVICE_MODES } from "@/lib/categories";
 
 const labelClass = "mb-1.5 block text-[13px] font-medium text-slate-800";
 const fieldClass = "h-11 rounded-lg px-3.5 text-[14px]";
 const selectClass =
   "h-11 w-full rounded-lg border border-slate-200 bg-white px-3.5 text-[14px] text-slate-800 outline-none focus:border-blue-400";
 
-const categories = [
-  "Electrical",
-  "Electronics",
-  "Appliance",
-  "Home",
-  "Air Conditioner",
-  "Television",
-  "Washing Machine",
-  "Mobile Phone",
-  "Other",
-];
-
-const serviceModes = ["On-site", "In-shop", "Remote"];
-
 export default function AddServiceForm() {
   const router = useRouter();
 
   const [title, setTitle] = useState("");
-  const [category, setCategory] = useState(categories[0]);
+  const [category, setCategory] = useState<(typeof SERVICE_CATEGORIES)[number]>(
+    SERVICE_CATEGORIES[0]
+  );
   const [price, setPrice] = useState("");
   const [location, setLocation] = useState("");
-  const [serviceMode, setServiceMode] = useState(serviceModes[0]);
+  const [serviceMode, setServiceMode] = useState<(typeof SERVICE_MODES)[number]>(
+    SERVICE_MODES[0]
+  );
   const [estimatedDuration, setEstimatedDuration] = useState("1-2 hours");
   const [description, setDescription] = useState("");
   const [thumbnail, setThumbnail] = useState("");
@@ -133,16 +124,17 @@ export default function AddServiceForm() {
         body: JSON.stringify({
           title: title.trim(),
           category,
-          price: amount,
-          location: location.trim(),
+          basePrice: amount,
+          serviceArea: location.trim(),
           serviceMode,
           estimatedDuration: estimatedDuration.trim(),
           description: description.trim(),
-          thumbnail,
+          image: thumbnail,
         }),
       });
       const data = (await response.json()) as {
         insertedId?: string;
+        _id?: string;
         error?: string;
       };
 
@@ -157,8 +149,9 @@ export default function AddServiceForm() {
         type: "success",
       });
 
-      if (data.insertedId) {
-        router.push(`/technician/services/${data.insertedId}`);
+      const serviceId = data._id ?? data.insertedId;
+      if (serviceId) {
+        router.push(`/technician/services/${serviceId}`);
       } else {
         router.push("/technician/services");
       }
@@ -255,10 +248,15 @@ export default function AddServiceForm() {
             <select
               id="service-category"
               value={category}
-              onChange={(event) => setCategory(event.target.value)}
+              onChange={(event) => {
+                const selected = SERVICE_CATEGORIES.find(
+                  (option) => option === event.target.value
+                );
+                if (selected) setCategory(selected);
+              }}
               className={selectClass}
             >
-              {categories.map((option) => (
+              {SERVICE_CATEGORIES.map((option) => (
                 <option key={option} value={option}>
                   {option}
                 </option>
@@ -303,10 +301,15 @@ export default function AddServiceForm() {
             <select
               id="service-mode"
               value={serviceMode}
-              onChange={(event) => setServiceMode(event.target.value)}
+              onChange={(event) => {
+                const selected = SERVICE_MODES.find(
+                  (option) => option === event.target.value
+                );
+                if (selected) setServiceMode(selected);
+              }}
               className={selectClass}
             >
-              {serviceModes.map((option) => (
+              {SERVICE_MODES.map((option) => (
                 <option key={option} value={option}>
                   {option}
                 </option>

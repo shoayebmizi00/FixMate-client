@@ -146,9 +146,9 @@ async function ServicesContent() {
               className="flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white"
             >
               <div className="relative aspect-[1.6] bg-slate-100">
-                {service.thumbnail ? (
+                {service.image || service.thumbnail ? (
                   <Image
-                    src={service.thumbnail}
+                    src={service.image || service.thumbnail || ""}
                     alt=""
                     fill
                     sizes="(min-width: 1280px) 30vw, (min-width: 640px) 45vw, 100vw"
@@ -170,13 +170,14 @@ async function ServicesContent() {
                 </div>
 
                 <p className="mt-1.5 text-[12.5px] text-slate-500">
-                  {service.category ?? "Service"} · {formatMoney(service.price)}
+                  {service.category ?? "Service"} ·{" "}
+                  {formatMoney(service.basePrice || service.price)}
                 </p>
 
-                {service.location ? (
+                {service.serviceArea || service.location ? (
                   <p className="mt-2 flex items-center gap-1.5 text-[12px] text-slate-500">
                     <MapPin className="size-3.5" aria-hidden="true" />
-                    {service.location}
+                    {service.serviceArea || service.location}
                   </p>
                 ) : null}
 

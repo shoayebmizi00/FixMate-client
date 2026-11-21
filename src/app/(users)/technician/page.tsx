@@ -147,7 +147,7 @@ async function TechnicianContent() {
                     </p>
                     <p className="mt-1 text-[12.5px] text-slate-500">
                       {service.category ?? "Service"} ·{" "}
-                      {formatMoney(service.price)}
+                      {formatMoney(service.basePrice || service.price)}
                     </p>
                   </div>
                   <ApprovalBadge status={service.approvalStatus} />
