@@ -7,6 +7,7 @@ import { fetchServicePage, type Service } from "@/lib/services";
 type SearchParams = Promise<{
   category?: string | string[];
   search?: string | string[];
+  q?: string | string[];
   mode?: string | string[];
   sort?: string | string[];
   page?: string | string[];
@@ -34,7 +35,12 @@ async function ServiceResults({
   try {
     const params = await searchParams;
     category = typeof params.category === "string" ? params.category : "";
-    search = typeof params.search === "string" ? params.search : "";
+    search =
+      typeof params.search === "string"
+        ? params.search
+        : typeof params.q === "string"
+          ? params.q
+          : "";
     mode = typeof params.mode === "string" ? params.mode : "";
     sort = typeof params.sort === "string" ? params.sort : "newest";
     page = typeof params.page === "string" ? Math.max(1, Number(params.page) || 1) : 1;
@@ -63,7 +69,7 @@ async function ServiceResults({
 
   return (
     <ServiceCatalog
-      key={category}
+      key={`${category}-${search}-${mode}-${sort}-${page}`}
       services={services}
       initialCategory={category}
       initialSearch={search}

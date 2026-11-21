@@ -78,13 +78,13 @@ const slides = [
 
 const categories = [
   { label: "All categories", value: "all" },
-  { label: "Smartphone", value: "smartphone" },
-  { label: "Laptop & PC", value: "laptop-pc" },
-  { label: "AC", value: "ac" },
-  { label: "Refrigerator", value: "refrigerator" },
-  { label: "TV", value: "tv" },
-  { label: "Washing Machine", value: "washing-machine" },
-  { label: "Electrical", value: "electrical" },
+  { label: "Smartphone", value: "Smartphone" },
+  { label: "Laptop & PC", value: "Laptop & PC" },
+  { label: "AC", value: "AC" },
+  { label: "Refrigerator", value: "Refrigerator" },
+  { label: "TV", value: "TV" },
+  { label: "Washing Machine", value: "Washing Machine" },
+  { label: "Electrical", value: "Electrical" },
 ];
 
 const guarantees = [
@@ -117,7 +117,7 @@ export default function Hero() {
     const query = String(formData.get("q") ?? "").trim();
     const params = new URLSearchParams();
 
-    if (query) params.set("q", query);
+    if (query) params.set("search", query);
     if (category !== "all") params.set("category", category);
 
     const search = params.toString();

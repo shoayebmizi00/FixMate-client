@@ -12,12 +12,12 @@ const quickLinks = [
 ];
 
 const popularRepairs = [
-  { label: "Smartphone", href: "/services?category=Electronics%20Repair" },
-  { label: "Laptop & PC", href: "/services?category=Electronics%20Repair" },
-  { label: "AC", href: "/services?category=Appliance%20Repair" },
-  { label: "Refrigerator", href: "/services?category=Appliance%20Repair" },
-  { label: "TV", href: "/services?category=Electronics%20Repair" },
-  { label: "Washing Machine", href: "/services?category=Appliance%20Repair" },
+  { label: "Smartphone", href: "/services?category=Smartphone" },
+  { label: "Laptop & PC", href: "/services?category=Laptop%20%26%20PC" },
+  { label: "AC", href: "/services?category=AC" },
+  { label: "Refrigerator", href: "/services?category=Refrigerator" },
+  { label: "TV", href: "/services?category=TV" },
+  { label: "Washing Machine", href: "/services?category=Washing%20Machine" },
   { label: "Electrical", href: "/services?category=Electrical" },
 ];
 
