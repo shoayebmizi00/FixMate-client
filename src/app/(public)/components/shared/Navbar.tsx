@@ -128,12 +128,12 @@ export default function Navbar() {
             <div className="size-10 animate-pulse rounded-full bg-slate-100" />
           ) : user ? (
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-3 rounded-full border border-slate-200 bg-white py-1.5 pr-3 pl-1.5 shadow-xs transition-colors hover:bg-slate-50 focus-visible:ring-2 focus-visible:ring-blue-600/30 focus-visible:outline-none">
-                <Avatar className="size-8">
+              <DropdownMenuTrigger className="flex items-center gap-2.5 rounded-full border border-slate-200 bg-white py-1.5 pr-2.5 pl-1.5 shadow-xs transition-all hover:border-slate-300 hover:bg-slate-50 focus-visible:ring-2 focus-visible:ring-blue-600/30 focus-visible:outline-none">
+                <Avatar className="size-9 ring-2 ring-white">
                   {user.image ? (
                     <AvatarImage src={user.image} alt={user.name} />
                   ) : null}
-                  <AvatarFallback className="bg-slate-200 text-[11px] font-semibold text-slate-700">
+                  <AvatarFallback className="bg-blue-50 text-[11px] font-semibold text-blue-700">
                     {getInitials(user.name)}
                   </AvatarFallback>
                 </Avatar>
@@ -142,33 +142,75 @@ export default function Navbar() {
                 </span>
                 <ChevronDown className="size-4 text-slate-400" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="min-w-56">
+              <DropdownMenuContent
+                align="end"
+                sideOffset={10}
+                className="w-[280px] rounded-2xl border-slate-200 p-2 shadow-[0_16px_40px_rgba(15,23,42,0.14)]"
+              >
                 <DropdownMenuGroup>
-                  <DropdownMenuLabel className="flex flex-col gap-0.5 px-2 py-1.5">
-                    <span className="truncate text-sm font-medium text-foreground">
-                      {user.name}
-                    </span>
-                    <span className="text-xs font-normal text-muted-foreground">
-                      {user.role === "admin"
-                        ? "Admin"
-                        : user.role === "technician"
-                          ? "Technician"
-                          : "Customer"}
-                    </span>
+                  <DropdownMenuLabel className="px-2 py-2">
+                    <div className="flex items-center gap-3">
+                      <Avatar className="size-11">
+                        {user.image ? (
+                          <AvatarImage src={user.image} alt={user.name} />
+                        ) : null}
+                        <AvatarFallback className="bg-blue-50 text-sm font-semibold text-blue-700">
+                          {getInitials(user.name)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-semibold text-slate-900">
+                          {user.name}
+                        </p>
+                        <span
+                          className={cn(
+                            "mt-1 inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase",
+                            user.role === "admin"
+                              ? "bg-violet-50 text-violet-700"
+                              : user.role === "technician"
+                                ? "bg-amber-50 text-amber-700"
+                                : "bg-blue-50 text-blue-700"
+                          )}
+                        >
+                          {user.role === "admin"
+                            ? "Admin"
+                            : user.role === "technician"
+                              ? "Technician"
+                              : "Customer"}
+                        </span>
+                      </div>
+                    </div>
                   </DropdownMenuLabel>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem render={<Link href="/dashboard" />}>
-                  <LayoutDashboard />
-                  Dashboard
+                <DropdownMenuItem
+                  render={<Link href="/dashboard" />}
+                  className="h-11 rounded-lg px-3 text-sm text-slate-700"
+                >
+                  <span className="grid size-8 place-items-center rounded-lg bg-slate-100 text-slate-700">
+                    <LayoutDashboard className="size-4" />
+                  </span>
+                  <span className="font-medium">Dashboard</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem render={<Link href="/dashboard/profile" />}>
-                  <User />
-                  Update profile
+                <DropdownMenuItem
+                  render={<Link href="/dashboard/profile" />}
+                  className="h-11 rounded-lg px-3 text-sm text-slate-700"
+                >
+                  <span className="grid size-8 place-items-center rounded-lg bg-slate-100 text-slate-700">
+                    <User className="size-4" />
+                  </span>
+                  <span className="font-medium">Update profile</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem variant="destructive" onClick={handleSignOut}>
-                  <LogOut />
-                  Sign out
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  variant="destructive"
+                  onClick={handleSignOut}
+                  className="h-11 rounded-lg px-3 text-sm"
+                >
+                  <span className="grid size-8 place-items-center rounded-lg bg-rose-50 text-rose-600">
+                    <LogOut className="size-4" />
+                  </span>
+                  <span className="font-medium">Sign out</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
