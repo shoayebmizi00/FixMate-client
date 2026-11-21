@@ -1,5 +1,5 @@
 export function dashboardPathForRole(role?: string | null) {
-  if (role === "admin") return "/dashboard/admin";
-  if (role === "technician") return "/dashboard/technician";
-  return "/dashboard/customer";
+  if (role === "admin") return "/admin";
+  if (role === "technician") return "/technician";
+  return "/customer";
 }

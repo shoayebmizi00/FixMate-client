@@ -238,7 +238,7 @@ export default function Navbar() {
                   <span className="font-medium">Dashboard</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  render={<Link href="/dashboard/profile" />}
+                  render={<Link href="/profile" />}
                   className="h-11 rounded-lg px-3 text-sm text-slate-700"
                 >
                   <span className="grid size-8 place-items-center rounded-lg bg-slate-100 text-slate-700">
@@ -321,7 +321,7 @@ export default function Navbar() {
                   Dashboard
                 </Link>
                 <Link
-                  href="/dashboard/profile"
+                  href="/profile"
                   onClick={closeMobileMenu}
                   className="block rounded-lg px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50"
                 >

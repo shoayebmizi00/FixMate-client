@@ -35,46 +35,46 @@ export type DashboardShellUser = {
 };
 
 const adminLinks = [
-  { label: "Overview", href: "/dashboard/admin", icon: LayoutDashboard },
-  { label: "Manage users", href: "/dashboard/admin/users", icon: Users },
+  { label: "Overview", href: "/admin", icon: LayoutDashboard },
+  { label: "Manage users", href: "/admin/manage-users", icon: Users },
   {
     label: "All Services",
-    href: "/dashboard/admin/services/all",
+    href: "/admin/all-services",
     icon: Wrench,
   },
   {
     label: "Approval requests",
-    href: "/dashboard/admin/services",
+    href: "/admin/service-approval",
     icon: ShieldCheck,
   },
-  { label: "All bookings", href: "/dashboard/admin/bookings", icon: ClipboardList },
+  { label: "All bookings", href: "/admin/all-bookings", icon: ClipboardList },
   {
     label: "Transactions",
-    href: "/dashboard/admin/transactions",
+    href: "/admin/transactions",
     icon: CircleDollarSign,
   },
-  { label: "Settings", href: "/dashboard/admin/settings", icon: Settings },
-  { label: "Profile", href: "/dashboard/profile", icon: User },
+  { label: "Settings", href: "/admin/settings", icon: Settings },
+  { label: "Profile", href: "/profile", icon: User },
 ];
 
 const customerLinks = [
-  { label: "Overview", href: "/dashboard/customer", icon: LayoutDashboard },
-  { label: "My bookings", href: "/dashboard/customer/bookings", icon: ClipboardList },
-  { label: "Payments", href: "/dashboard/customer/payments", icon: Wallet },
-  { label: "Profile", href: "/dashboard/profile", icon: User },
+  { label: "Overview", href: "/customer", icon: LayoutDashboard },
+  { label: "My bookings", href: "/customer/bookings", icon: ClipboardList },
+  { label: "Payments", href: "/customer/payments", icon: Wallet },
+  { label: "Profile", href: "/profile", icon: User },
 ];
 
 const technicianLinks = [
-  { label: "Overview", href: "/dashboard/technician", icon: LayoutDashboard },
+  { label: "Overview", href: "/technician", icon: LayoutDashboard },
   { label: "Add service", href: "/technician/services/new", icon: Plus },
-  { label: "My services", href: "/dashboard/technician/my-services", icon: Wrench },
-  { label: "Bookings", href: "/dashboard/technician/requests", icon: ClipboardList },
+  { label: "My services", href: "/technician/services", icon: Wrench },
+  { label: "Bookings", href: "/technician/bookings", icon: ClipboardList },
   {
     label: "Earnings",
     href: "/technician/earnings",
     icon: CircleDollarSign,
   },
-  { label: "Profile", href: "/dashboard/profile", icon: User },
+  { label: "Profile", href: "/profile", icon: User },
 ];
 
 function getInitials(name?: string | null) {
@@ -95,13 +95,13 @@ function linksForRole(role?: string | null) {
 }
 
 function isLinkActive(pathname: string, href: string) {
-  if (href === "/dashboard/admin/services" && pathname === "/dashboard/admin/services/all") {
+  if (href === "/admin/service-approval" && pathname === "/admin/all-services") {
     return false;
   }
   if (
-    href === "/dashboard/admin" ||
-    href === "/dashboard/customer" ||
-    href === "/dashboard/technician"
+    href === "/admin" ||
+    href === "/customer" ||
+    href === "/technician"
   ) {
     return pathname === href;
   }
@@ -285,7 +285,7 @@ export default function DashboardShell({
               </Link>
             ) : null}
             <Link
-              href="/dashboard/profile"
+              href="/profile"
               aria-label="Your profile"
               className="relative flex size-9 items-center justify-center overflow-hidden rounded-full bg-slate-900 text-[11px] font-semibold text-white"
             >

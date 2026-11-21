@@ -21,6 +21,13 @@ function isProtectedPath(pathname: string) {
 export function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
 
+  if (pathname === "/signin") {
+    const url = request.nextUrl.clone();
+    url.pathname = "/sign-in";
+
+    return NextResponse.redirect(url, 308);
+  }
+
   // Keep the old singular /service/... links working.
   if (pathname === "/service" || pathname.startsWith("/service/")) {
     const url = request.nextUrl.clone();
@@ -48,11 +55,16 @@ export function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     "/service/:path*",
+    "/signin",
+    "/admin",
     "/dashboard",
     "/dashboard/:path*",
+    "/customer",
     "/admin/:path*",
     "/customer/:path*",
+    "/technician",
     "/technician/:path*",
+    "/profile",
     "/profile/:path*",
   ],
 };

@@ -125,7 +125,7 @@ async function ServicePageGuard({
 }) {
   const session = await sessionPromise;
   if (session?.user.role === "technician") {
-    redirect("/dashboard/technician");
+    redirect("/technician");
   }
 
   return (

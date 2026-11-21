@@ -89,7 +89,7 @@ export default function BookingForm({
         description: "The technician can now review your request.",
         type: "success",
       });
-      router.push("/dashboard/customer/bookings");
+      router.push("/customer/bookings");
     } catch (requestError) {
       const message =
         requestError instanceof Error

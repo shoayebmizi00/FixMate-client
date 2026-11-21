@@ -220,7 +220,7 @@ function TechnicianListSkeleton() {
 export default async function TechniciansPage() {
   const session = await getCurrentSession();
   if (session?.user.role === "technician") {
-    redirect("/dashboard/technician");
+    redirect("/technician");
   }
 
   return (

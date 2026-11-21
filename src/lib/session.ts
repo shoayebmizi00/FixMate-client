@@ -29,7 +29,7 @@ export async function requireSession() {
   const session = await getCurrentSession();
 
   if (!session) {
-    redirect("/signin");
+    redirect("/sign-in");
   }
 
   return session;

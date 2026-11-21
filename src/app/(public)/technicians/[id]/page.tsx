@@ -230,7 +230,7 @@ export default async function TechnicianProfilePage({
 }) {
   const session = await getCurrentSession();
   if (session?.user.role === "technician") {
-    redirect("/dashboard/technician");
+    redirect("/technician");
   }
 
   return (

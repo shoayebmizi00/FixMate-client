@@ -51,7 +51,7 @@ export default function ServiceActions({
       const data = (await response.json()) as { error?: string };
       if (!response.ok) throw new Error(data.error || "Could not delete the service.");
       toast.add({ title: "Service deleted", description: "The listing was removed.", type: "success" });
-      router.push("/dashboard/technician/my-services");
+      router.push("/technician/services");
     } catch (error) {
       toast.add({
         title: "Delete failed",
