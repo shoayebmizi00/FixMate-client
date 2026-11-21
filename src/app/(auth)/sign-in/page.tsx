@@ -149,6 +149,12 @@ export default function SignInPage() {
     router.refresh();
   }
 
+  function fillQuickAccount(accountEmail: string) {
+    setEmail(accountEmail);
+    setPassword("123456aA!");
+    setError(null);
+  }
+
   const busy = socialPending !== null || isSubmitting;
 
   return (
@@ -388,6 +394,38 @@ export default function SignInPage() {
                 {isSubmitting ? "Signing in…" : "Sign in"}
               </Button>
             </form>
+
+            <div className="mt-6 border-t border-slate-200 pt-5">
+              <p className="text-center text-xs font-semibold tracking-[0.12em] text-slate-400 uppercase">
+                Quick access
+              </p>
+              <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                <button
+                  type="button"
+                  onClick={() => fillQuickAccount("customer@gmail.com")}
+                  className="rounded-xl border border-blue-100 bg-blue-50 px-3 py-3 text-left transition-colors hover:border-blue-200 hover:bg-blue-100"
+                >
+                  <span className="block text-[12.5px] font-semibold text-blue-700">
+                    Customer
+                  </span>
+                  <span className="mt-1 block truncate text-[11.5px] text-slate-600">
+                    customer@gmail.com
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => fillQuickAccount("technician@gmail.com")}
+                  className="rounded-xl border border-amber-100 bg-amber-50 px-3 py-3 text-left transition-colors hover:border-amber-200 hover:bg-amber-100"
+                >
+                  <span className="block text-[12.5px] font-semibold text-amber-700">
+                    Technician
+                  </span>
+                  <span className="mt-1 block truncate text-[11.5px] text-slate-600">
+                    technician@gmail.com
+                  </span>
+                </button>
+              </div>
+            </div>
 
             <p className="mt-6 text-center text-sm text-slate-500">
               New to FixMate?{" "}
